@@ -1,0 +1,6 @@
+{
+  "name": "NicaGo - Transporte Inteligente",
+  "description": "Navega por Nicaragua con NicaGo. Encuentra rutas de transporte público, paradas y gestiona tu viaje con facilidad.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

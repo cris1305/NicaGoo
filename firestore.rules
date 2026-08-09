@@ -1,0 +1,153 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    // Bootstrapped Admin check
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'cristopheramirez20@gmail.com'
+      );
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Validation Helpers ---
+
+    function isValidRoute(data) {
+      return data.keys().hasAll(['name', 'code', 'color']) 
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.code is string && data.code.size() > 0 && data.code.size() <= 20
+        && data.color is string && data.color.matches('^#[0-9a-fA-F]{6}$')
+        && (!data.keys().hasAny(['description']) || (data.description is string && data.description.size() <= 500))
+        && (!data.keys().hasAny(['photoUrl']) || (data.photoUrl is string && data.photoUrl.size() <= 500));
+    }
+
+    function isValidStop(data) {
+      return data.keys().hasAll(['name', 'lat', 'lng'])
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.lat is number && data.lng is number
+        && (!data.keys().hasAny(['description']) || (data.description is string && data.description.size() <= 500))
+        && (!data.keys().hasAny(['generalInfo']) || (data.generalInfo is string && data.generalInfo.size() <= 1000))
+        && (!data.keys().hasAny(['photoUrl']) || (data.photoUrl is string && data.photoUrl.size() <= 500));
+    }
+
+    function isValidRouteStop(data) {
+      return data.keys().hasAll(['routeId', 'stopId', 'sequence'])
+        && data.routeId is string && data.stopId is string && data.sequence is int
+        && exists(/databases/$(database)/documents/routes/$(data.routeId))
+        && exists(/databases/$(database)/documents/stops/$(data.stopId));
+    }
+
+    function isValidDriver(data) {
+      return data.keys().hasAll(['name', 'age', 'photoUrl', 'idCardPhotoUrl'])
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.age is int && data.age >= 18 && data.age <= 100
+        && data.photoUrl is string && data.photoUrl.size() <= 500
+        && data.idCardPhotoUrl is string && data.idCardPhotoUrl.size() <= 500
+        && (!data.keys().hasAny(['generalInfo']) || (data.generalInfo is string && data.generalInfo.size() <= 1000));
+    }
+
+    function isValidReport(data) {
+      return data.keys().hasAll(['userId', 'type', 'targetId', 'reason', 'description', 'status', 'createdAt'])
+        && data.userId == request.auth.uid
+        && data.type in ['route', 'stop', 'driver']
+        && data.reason in ['drunk', 'reckless', 'bad_condition', 'other']
+        && data.description is string && data.description.size() > 0 && data.description.size() <= 2000
+        && data.status in ['pending', 'read', 'resolved']
+        && data.createdAt is string; // Using string as per types.ts, should ideally be server timestamp
+    }
+
+    function isValidFavorite(data) {
+      return data.keys().hasAll(['userId', 'routeId', 'createdAt'])
+        && data.userId == request.auth.uid
+        && data.routeId is string
+        && exists(/databases/$(database)/documents/routes/$(data.routeId))
+        && data.createdAt is string;
+    }
+
+    function isValidHistoryItem(data) {
+      return data.keys().hasAll(['userId', 'origin', 'destination', 'createdAt'])
+        && data.userId == request.auth.uid
+        && data.origin is string
+        && data.destination is string
+        && data.createdAt is string;
+    }
+
+    function isValidSchedule(data) {
+      return data.keys().hasAll(['routeId', 'stopId', 'time'])
+        && data.routeId is string && data.stopId is string && data.time is string
+        && data.time.matches('^[0-9]{2}:[0-9]{2}$')
+        && exists(/databases/$(database)/documents/routes/$(data.routeId))
+        && exists(/databases/$(database)/documents/stops/$(data.stopId));
+    }
+
+    // --- Collections ---
+
+    match /routes/{routeId} {
+      allow read, write: if true;
+    }
+
+    match /stops/{stopId} {
+      allow read, write: if true;
+    }
+
+    match /routeStops/{mappingId} {
+      allow read, write: if true;
+    }
+
+    match /drivers/{driverId} {
+      allow read, write: if true;
+    }
+
+    match /reports/{reportId} {
+      allow read, write: if true;
+    }
+
+    match /favorites/{favoriteId} {
+      allow read, write: if true;
+    }
+
+    match /history/{historyId} {
+      allow read, write: if true;
+    }
+
+    match /schedules/{scheduleId} {
+      allow read, write: if true;
+    }
+
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    match /touristPosts/{postId} {
+      allow read, write: if true;
+    }
+  }
+}

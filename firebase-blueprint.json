@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "Route": {
+      "title": "Route",
+      "description": "A bus route in the transport system",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the route" },
+        "code": { "type": "string", "description": "Unique code for the route (e.g. R101)" },
+        "color": { "type": "string", "description": "Hex color code for the route" },
+        "description": { "type": "string", "description": "Description of the route" }
+      },
+      "required": ["name", "code", "color"]
+    },
+    "Stop": {
+      "title": "Stop",
+      "description": "A bus stop or bay",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the stop" },
+        "lat": { "type": "number", "description": "Latitude" },
+        "lng": { "type": "number", "description": "Longitude" },
+        "description": { "type": "string", "description": "Description of the stop" }
+      },
+      "required": ["name", "lat", "lng"]
+    },
+    "RouteStop": {
+      "title": "RouteStop",
+      "description": "Mapping between a route and a stop",
+      "type": "object",
+      "properties": {
+        "routeId": { "type": "string", "description": "ID of the route" },
+        "stopId": { "type": "string", "description": "ID of the stop" },
+        "sequence": { "type": "integer", "description": "Order of the stop in the route" }
+      },
+      "required": ["routeId", "stopId", "sequence"]
+    },
+    "Driver": {
+      "title": "Driver",
+      "description": "A bus driver",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "age": { "type": "integer" },
+        "photoUrl": { "type": "string" },
+        "idCardPhotoUrl": { "type": "string" },
+        "generalInfo": { "type": "string" }
+      },
+      "required": ["name", "age", "photoUrl", "idCardPhotoUrl"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "A user report about a route, stop, or driver",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["route", "stop", "driver"] },
+        "targetId": { "type": "string" },
+        "reason": { "type": "string", "enum": ["drunk", "reckless", "bad_condition", "other"] },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "read", "resolved"] },
+        "adminResponse": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "targetId", "reason", "description", "status", "createdAt"]
+    },
+    "Favorite": {
+      "title": "Favorite",
+      "description": "A user's favorite route",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "routeId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "routeId", "createdAt"]
+    },
+    "HistoryItem": {
+      "title": "HistoryItem",
+      "description": "A user's search history",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "origin": { "type": "string" },
+        "destination": { "type": "string" },
+        "routeId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "origin", "destination", "createdAt"]
+    },
+    "Schedule": {
+      "title": "Schedule",
+      "description": "Departure/passing time for a route at a specific stop",
+      "type": "object",
+      "properties": {
+        "routeId": { "type": "string" },
+        "stopId": { "type": "string" },
+        "time": { "type": "string", "description": "Time in HH:mm format" }
+      },
+      "required": ["routeId", "stopId", "time"]
+    },
+    "User": {
+      "title": "User",
+      "description": "An application user registered in the system",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "passenger"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "TouristPost": {
+      "title": "TouristPost",
+      "description": "Promotional tourist destination post",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "coverPhoto": { "type": "string" },
+        "schedule": { "type": "string" },
+        "entryFee": { "type": "string" },
+        "destinationStopName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "category", "coverPhoto", "schedule", "destinationStopName"]
+    }
+  },
+  "firestore": {
+    "/routes/{routeId}": { "schema": "Route", "description": "Collection of bus routes" },
+    "/stops/{stopId}": { "schema": "Stop", "description": "Collection of bus stops" },
+    "/routeStops/{mappingId}": { "schema": "RouteStop", "description": "Mappings between routes and stops" },
+    "/drivers/{driverId}": { "schema": "Driver", "description": "Collection of bus drivers" },
+    "/reports/{reportId}": { "schema": "Report", "description": "User reports" },
+    "/favorites/{favoriteId}": { "schema": "Favorite", "description": "User favorite routes" },
+    "/history/{historyId}": { "schema": "HistoryItem", "description": "User search history" },
+    "/schedules/{scheduleId}": { "schema": "Schedule", "description": "Route schedules" },
+    "/users/{userId}": { "schema": "User", "description": "Collection of app users" },
+    "/touristPosts/{postId}": { "schema": "TouristPost", "description": "Collection of tourist promotional posts" }
+  }
+}
