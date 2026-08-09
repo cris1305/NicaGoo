@@ -1,26 +1,47 @@
 import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Route, Stop, RouteStop, RouteOption, PathStep, Schedule } from '../types';
+import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandler';
 
 export class RouteService {
   static async getAllRoutes(): Promise<Route[]> {
-    const snapshot = await getDocs(collection(db, 'routes'));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Route));
+    try {
+      const snapshot = await getDocs(collection(db, 'routes'));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Route));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, 'routes');
+      return [];
+    }
   }
 
   static async getAllStops(): Promise<Stop[]> {
-    const snapshot = await getDocs(collection(db, 'stops'));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Stop));
+    try {
+      const snapshot = await getDocs(collection(db, 'stops'));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Stop));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, 'stops');
+      return [];
+    }
   }
 
   static async getRouteStops(): Promise<RouteStop[]> {
-    const snapshot = await getDocs(collection(db, 'routeStops'));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RouteStop));
+    try {
+      const snapshot = await getDocs(collection(db, 'routeStops'));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RouteStop));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, 'routeStops');
+      return [];
+    }
   }
 
   static async getSchedules(): Promise<Schedule[]> {
-    const snapshot = await getDocs(collection(db, 'schedules'));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Schedule));
+    try {
+      const snapshot = await getDocs(collection(db, 'schedules'));
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Schedule));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, 'schedules');
+      return [];
+    }
   }
 
   static calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

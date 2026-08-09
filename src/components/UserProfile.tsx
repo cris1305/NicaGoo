@@ -10,341 +10,600 @@ import { cn } from '../lib/utils';
 import { useLanguage } from '../lib/LanguageContext';
 
 const createGuardabarrancoSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgG" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0284c7"/>
-      <stop offset="100%" stop-color="#0f766e"/>
+    <radialGradient id="gbGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="50%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
     </linearGradient>
+    <linearGradient id="bellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="shadow3d" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.35"/>
+    </filter>
   </defs>
   <style>
-    @keyframes flap { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-10deg); } }
-    @keyframes tail { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
-    .bird { animation: float 2.5s ease-in-out infinite; }
-    .wing { animation: flap 1.2s ease-in-out infinite; transform-origin: 40px 45px; }
-    .tail { animation: tail 2s ease-in-out infinite; transform-origin: 50px 65px; }
+    @keyframes floatBird { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+    @keyframes wingFlap { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-8deg); } }
+    @keyframes tailSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+    .bird3d { animation: floatBird 3s ease-in-out infinite; transform-origin: 60px 60px; filter: url(#shadow3d); }
+    .wing3d { animation: wingFlap 1.5s ease-in-out infinite; transform-origin: 50px 52px; }
+    .tail3d { animation: tailSway 2.2s ease-in-out infinite; transform-origin: 60px 75px; }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgG)"/>
-  <g class="bird">
-    <g class="tail">
-      <line x1="50" y1="65" x2="40" y2="92" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
-      <line x1="50" y1="65" x2="60" y2="92" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="40" cy="92" r="4" fill="#0d9488"/>
-      <circle cx="60" cy="92" r="4" fill="#0d9488"/>
+  <circle cx="60" cy="60" r="56" fill="url(#gbGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.12"/>
+  <g class="bird3d">
+    <g class="tail3d">
+      <path d="M 60 75 L 48 108" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M 60 75 L 72 108" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="48" cy="108" r="5.5" fill="#0284c7"/>
+      <circle cx="48" cy="108" r="2.5" fill="#38bdf8"/>
+      <circle cx="72" cy="108" r="5.5" fill="#0284c7"/>
+      <circle cx="72" cy="108" r="2.5" fill="#38bdf8"/>
     </g>
-    <ellipse cx="50" cy="52" rx="15" ry="19" fill="#15803d"/>
-    <ellipse cx="50" cy="55" rx="10" ry="14" fill="#d97706"/>
-    <circle cx="50" cy="32" r="13" fill="#0f766e"/>
-    <path d="M 40 26 Q 50 20 60 26" stroke="#38bdf8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-    <path d="M 40 31 L 60 31" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="54" cy="31" r="3" fill="#ffffff"/>
-    <circle cx="54.8" cy="31" r="1.5" fill="#0f172a"/>
-    <polygon points="58,29 74,34 58,37" fill="#1e293b"/>
-    <path class="wing" d="M 42 42 Q 28 55 42 66 Q 48 55 42 42 Z" fill="#0284c7"/>
+    <ellipse cx="60" cy="62" rx="18" ry="22" fill="url(#bodyGrad)"/>
+    <ellipse cx="60" cy="66" rx="12" ry="16" fill="url(#bellyGrad)"/>
+    <circle cx="60" cy="38" r="15" fill="#047857"/>
+    <path d="M 47 30 Q 60 22 73 30" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M 48 37 C 55 35 68 35 74 37 Q 60 42 48 37 Z" fill="#0f172a"/>
+    <circle cx="64" cy="37" r="4.5" fill="#ffffff"/>
+    <circle cx="65" cy="37" r="2.8" fill="#0f172a"/>
+    <circle cx="66" cy="35.5" r="1.2" fill="#ffffff"/>
+    <polygon points="69,34 90,40 69,44" fill="#1e293b"/>
+    <polygon points="69,34 85,38 69,40" fill="#334155"/>
+    <path class="wing3d" d="M 52 50 C 32 60 42 82 58 78 C 66 72 62 55 52 50 Z" fill="url(#wingGrad)"/>
+    <path d="M 50 54 Q 38 64 52 72" stroke="#38bdf8" stroke-width="2" fill="none" opacity="0.6"/>
   </g>
 </svg>
 `)}`;
 
 const createJaguarSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgJ" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#d97706"/>
-      <stop offset="100%" stop-color="#78350f"/>
+    <radialGradient id="jagGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="50%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#451a03"/>
+    </radialGradient>
+    <linearGradient id="fur3d" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
     </linearGradient>
+    <linearGradient id="snoutGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <filter id="jagShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#451a03" flood-opacity="0.4"/>
+    </filter>
   </defs>
   <style>
-    @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
-    @keyframes ear { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
-    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-    .jaguar { animation: breathe 3s ease-in-out infinite; transform-origin: center; }
-    .eye { animation: blink 4s infinite; transform-origin: center; }
-    .earR { animation: ear 2.5s infinite; transform-origin: 65px 25px; }
+    @keyframes jagBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+    @keyframes eyeBlink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+    .jag3d { animation: jagBreathe 3.5s ease-in-out infinite; transform-origin: 60px 60px; filter: url(#jagShadow); }
+    .jagEye { animation: eyeBlink 4s infinite; transform-origin: 60px 56px; }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgJ)"/>
-  <g class="jaguar">
-    <circle cx="32" cy="28" r="11" fill="#f59e0b"/>
-    <circle cx="32" cy="28" r="6" fill="#451a03"/>
-    <circle class="earR" cx="68" cy="28" r="11" fill="#f59e0b"/>
-    <circle class="earR" cx="68" cy="28" r="6" fill="#451a03"/>
-    <circle cx="50" cy="52" r="28" fill="#f59e0b"/>
-    <circle cx="35" cy="40" r="3" fill="#451a03"/>
-    <circle cx="65" cy="40" r="3" fill="#451a03"/>
-    <circle cx="50" cy="33" r="2.5" fill="#451a03"/>
-    <circle cx="30" cy="58" r="3.5" fill="#451a03"/>
-    <circle cx="70" cy="58" r="3.5" fill="#451a03"/>
-    <ellipse cx="50" cy="62" rx="14" ry="11" fill="#fef3c7"/>
-    <polygon points="46,56 54,56 50,62" fill="#451a03"/>
-    <path d="M 50 62 L 50 67 M 50 67 Q 44 71 40 67 M 50 67 Q 56 71 60 67" stroke="#451a03" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <g class="eye">
-      <ellipse cx="38" cy="48" rx="5" ry="6" fill="#fef08a"/>
-      <ellipse cx="38" cy="48" rx="2" ry="5" fill="#0f172a"/>
-      <circle cx="37" cy="46" r="1.5" fill="#ffffff"/>
-      <ellipse cx="62" cy="48" rx="5" ry="6" fill="#fef08a"/>
-      <ellipse cx="62" cy="48" rx="2" ry="5" fill="#0f172a"/>
-      <circle cx="61" cy="46" r="1.5" fill="#ffffff"/>
+  <circle cx="60" cy="60" r="56" fill="url(#jagGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.15"/>
+  <g class="jag3d">
+    <circle cx="36" cy="34" r="14" fill="#d97706"/>
+    <circle cx="36" cy="34" r="8" fill="#451a03"/>
+    <circle cx="36" cy="34" r="4" fill="#f59e0b"/>
+    <circle cx="84" cy="34" r="14" fill="#d97706"/>
+    <circle cx="84" cy="34" r="8" fill="#451a03"/>
+    <circle cx="84" cy="34" r="4" fill="#f59e0b"/>
+    <circle cx="60" cy="62" r="32" fill="url(#fur3d)"/>
+    <circle cx="42" cy="46" r="3.5" fill="#451a03"/>
+    <circle cx="78" cy="46" r="3.5" fill="#451a03"/>
+    <circle cx="38" cy="68" r="4" fill="#451a03"/>
+    <circle cx="82" cy="68" r="4" fill="#451a03"/>
+    <circle cx="60" cy="38" r="3" fill="#78350f"/>
+    <ellipse cx="60" cy="74" rx="16" ry="12" fill="url(#snoutGrad)"/>
+    <polygon points="55,67 65,67 60,74" fill="#451a03"/>
+    <path d="M 60 74 L 60 79 M 60 79 Q 53 84 48 79 M 60 79 Q 67 84 72 79" stroke="#451a03" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <g class="jagEye">
+      <ellipse cx="46" cy="56" rx="6" ry="7" fill="#fef08a"/>
+      <ellipse cx="46" cy="56" rx="2.5" ry="6" fill="#0f172a"/>
+      <circle cx="44.5" cy="53.5" r="1.8" fill="#ffffff"/>
+      <ellipse cx="74" cy="56" rx="6" ry="7" fill="#fef08a"/>
+      <ellipse cx="74" cy="56" rx="2.5" ry="6" fill="#0f172a"/>
+      <circle cx="72.5" cy="53.5" r="1.8" fill="#ffffff"/>
     </g>
   </g>
 </svg>
 `)}`;
 
 const createMonoCongoSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgM" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#15803d"/>
-      <stop offset="100%" stop-color="#064e3b"/>
+    <radialGradient id="monoGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="50%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#052e16"/>
+    </radialGradient>
+    <linearGradient id="monoFur" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3f2314"/>
+      <stop offset="100%" stop-color="#1c0d06"/>
     </linearGradient>
+    <linearGradient id="monoFace" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ca8a04"/>
+      <stop offset="100%" stop-color="#854d0e"/>
+    </linearGradient>
+    <filter id="monoShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#052e16" flood-opacity="0.4"/>
+    </filter>
   </defs>
   <style>
-    @keyframes sway { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
-    @keyframes headBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
-    @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
-    .mono { animation: headBob 2s ease-in-out infinite; }
-    .tail { animation: sway 2.5s ease-in-out infinite; transform-origin: 80px 70px; }
-    .eye { animation: blink 3.5s infinite; transform-origin: center; }
+    @keyframes monoBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes tailSway2 { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+    .mono3d { animation: monoBob 2.8s ease-in-out infinite; transform-origin: 60px 60px; filter: url(#monoShadow); }
+    .monoTail3d { animation: tailSway2 3s ease-in-out infinite; transform-origin: 90px 80px; }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgM)"/>
-  <path class="tail" d="M 60 70 Q 80 75 80 50 Q 80 30 65 35" stroke="#3f2314" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <g class="mono">
-    <circle cx="26" cy="48" r="9" fill="#3f2314"/>
-    <circle cx="26" cy="48" r="5" fill="#a16207"/>
-    <circle cx="74" cy="48" r="9" fill="#3f2314"/>
-    <circle cx="74" cy="48" r="5" fill="#a16207"/>
-    <ellipse cx="50" cy="68" rx="22" ry="18" fill="#3f2314"/>
-    <circle cx="50" cy="48" r="24" fill="#3f2314"/>
-    <ellipse cx="50" cy="52" rx="16" ry="14" fill="#a16207"/>
-    <ellipse cx="50" cy="58" rx="10" ry="7" fill="#fef3c7"/>
-    <ellipse cx="50" cy="55" rx="3" ry="2" fill="#3f2314"/>
-    <path d="M 44 61 Q 50 65 56 61" stroke="#3f2314" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <g class="eye">
-      <circle cx="41" cy="46" r="4.5" fill="#ffffff"/>
-      <circle cx="41" cy="46" r="2.5" fill="#1e293b"/>
-      <circle cx="42" cy="45" r="1" fill="#ffffff"/>
-      <circle cx="59" cy="46" r="4.5" fill="#ffffff"/>
-      <circle cx="59" cy="46" r="2.5" fill="#1e293b"/>
-      <circle cx="60" cy="45" r="1" fill="#ffffff"/>
-    </g>
+  <circle cx="60" cy="60" r="56" fill="url(#monoGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.15"/>
+  <path class="monoTail3d" d="M 70 80 Q 98 85 95 55 Q 92 35 78 40" stroke="#2e190e" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <g class="mono3d">
+    <circle cx="32" cy="56" r="11" fill="url(#monoFur)"/>
+    <circle cx="32" cy="56" r="6" fill="url(#monoFace)"/>
+    <circle cx="88" cy="56" r="11" fill="url(#monoFur)"/>
+    <circle cx="88" cy="56" r="6" fill="url(#monoFace)"/>
+    <ellipse cx="60" cy="80" rx="26" ry="20" fill="url(#monoFur)"/>
+    <circle cx="60" cy="56" r="28" fill="url(#monoFur)"/>
+    <ellipse cx="60" cy="60" rx="19" ry="16" fill="url(#monoFace)"/>
+    <ellipse cx="60" cy="67" rx="12" ry="8" fill="#fef3c7"/>
+    <ellipse cx="60" cy="64" rx="3.5" ry="2.5" fill="#2e190e"/>
+    <path d="M 52 71 Q 60 76 68 71" stroke="#2e190e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <circle cx="49" cy="54" r="5.5" fill="#ffffff"/>
+    <circle cx="49" cy="54" r="3" fill="#1e293b"/>
+    <circle cx="50.5" cy="52.5" r="1.3" fill="#ffffff"/>
+    <circle cx="71" cy="54" r="5.5" fill="#ffffff"/>
+    <circle cx="71" cy="54" r="3" fill="#1e293b"/>
+    <circle cx="72.5" cy="52.5" r="1.3" fill="#ffffff"/>
   </g>
 </svg>
 `)}`;
 
 const createTortugaSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgT" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0284c7"/>
-      <stop offset="100%" stop-color="#1e3a8a"/>
+    <radialGradient id="torGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </radialGradient>
+    <linearGradient id="shell3d" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="50%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#14532d"/>
     </linearGradient>
+    <filter id="torShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#0c4a6e" flood-opacity="0.4"/>
+    </filter>
   </defs>
   <style>
-    @keyframes paddle { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(12deg); } }
-    @keyframes bubble { 0% { transform: translateY(0) scale(0.8); opacity: 0; } 50% { opacity: 0.8; } 100% { transform: translateY(-30px) scale(1.2); opacity: 0; } }
-    @keyframes swim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-    .turtle { animation: swim 3s ease-in-out infinite; }
-    .fL { animation: paddle 1.8s ease-in-out infinite; transform-origin: 30px 40px; }
-    .fR { animation: paddle 1.8s ease-in-out infinite reverse; transform-origin: 70px 40px; }
-    .b1 { animation: bubble 3s infinite 0s; }
-    .b2 { animation: bubble 3s infinite 1.5s; }
+    @keyframes torSwim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @keyframes paddleL { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(14deg); } }
+    @keyframes paddleR { 0%, 100% { transform: rotate(8deg); } 50% { transform: rotate(-14deg); } }
+    .tor3d { animation: torSwim 3.2s ease-in-out infinite; transform-origin: 60px 60px; filter: url(#torShadow); }
+    .fL3d { animation: paddleL 2s ease-in-out infinite; transform-origin: 36px 48px; }
+    .fR3d { animation: paddleR 2s ease-in-out infinite; transform-origin: 84px 48px; }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgT)"/>
-  <circle class="b1" cx="25" cy="70" r="3" fill="#ffffff" opacity="0.6"/>
-  <circle class="b2" cx="75" cy="80" r="4" fill="#ffffff" opacity="0.6"/>
-  <g class="turtle">
-    <path class="fL" d="M 30 40 Q 10 35 12 55 Q 25 55 35 48 Z" fill="#15803d"/>
-    <path class="fR" d="M 70 40 Q 90 35 88 55 Q 75 55 65 48 Z" fill="#15803d"/>
-    <ellipse cx="38" cy="72" rx="6" ry="10" fill="#166534" transform="rotate(-20 38 72)"/>
-    <ellipse cx="62" cy="72" rx="6" ry="10" fill="#166534" transform="rotate(20 62 72)"/>
-    <ellipse cx="50" cy="24" rx="10" ry="12" fill="#22c55e"/>
-    <circle cx="45" cy="20" r="2" fill="#0f172a"/>
-    <circle cx="55" cy="20" r="2" fill="#0f172a"/>
-    <ellipse cx="50" cy="52" rx="24" ry="26" fill="#166534"/>
-    <polygon points="50,34 58,42 58,54 50,62 42,54 42,42" fill="#15803d" stroke="#fef08a" stroke-width="1.5"/>
-    <polygon points="50,62 58,70 42,70" fill="#15803d" stroke="#fef08a" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="56" fill="url(#torGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.15"/>
+  <g class="tor3d">
+    <path class="fL3d" d="M 36 48 C 12 40 14 66 38 58 Z" fill="#15803d"/>
+    <path class="fR3d" d="M 84 48 C 108 40 106 66 82 58 Z" fill="#15803d"/>
+    <ellipse cx="60" cy="28" rx="12" ry="15" fill="#22c55e"/>
+    <circle cx="53" cy="23" r="2.5" fill="#0f172a"/>
+    <circle cx="67" cy="23" r="2.5" fill="#0f172a"/>
+    <circle cx="54" cy="22" r="0.9" fill="#ffffff"/>
+    <circle cx="68" cy="22" r="0.9" fill="#ffffff"/>
+    <ellipse cx="60" cy="64" rx="28" ry="30" fill="url(#shell3d)"/>
+    <polygon points="60,42 70,52 70,68 60,78 50,68 50,52" fill="#16a34a" stroke="#fef08a" stroke-width="2"/>
+    <polygon points="60,78 70,88 50,88" fill="#16a34a" stroke="#fef08a" stroke-width="2"/>
   </g>
 </svg>
 `)}`;
 
 const createChocoyoSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgC" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#16a34a"/>
+    <radialGradient id="chocGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="50%" stop-color="#16a34a"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </radialGradient>
+    <linearGradient id="feather3d" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e"/>
       <stop offset="100%" stop-color="#15803d"/>
     </linearGradient>
+    <filter id="chocShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#064e3b" flood-opacity="0.4"/>
+    </filter>
   </defs>
   <style>
-    @keyframes headTilt { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-8deg); } }
-    @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
-    .chocoyo { animation: headTilt 2.2s ease-in-out infinite; transform-origin: 50px 60px; }
-    .eye { animation: blink 3s infinite; transform-origin: center; }
+    @keyframes chocTilt { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-7deg); } }
+    .choc3d { animation: chocTilt 2.5s ease-in-out infinite; transform-origin: 60px 70px; filter: url(#chocShadow); }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgC)"/>
-  <g class="chocoyo">
-    <polygon points="46,65 54,65 50,95" fill="#0d9488"/>
-    <ellipse cx="50" cy="56" rx="16" ry="20" fill="#22c55e"/>
-    <ellipse cx="50" cy="58" rx="10" ry="14" fill="#facc15"/>
-    <circle cx="50" cy="34" r="15" fill="#22c55e"/>
-    <circle cx="40" cy="38" r="4" fill="#dc2626"/>
-    <path d="M 54 28 Q 72 34 56 42 Z" fill="#ea580c"/>
-    <g class="eye">
-      <circle cx="48" cy="32" r="4.5" fill="#ffffff"/>
-      <circle cx="48" cy="32" r="2.5" fill="#0f172a"/>
-      <circle cx="49" cy="31" r="1" fill="#ffffff"/>
-    </g>
-    <path d="M 38 46 Q 24 60 38 72 Q 44 60 38 46 Z" fill="#16a34a"/>
+  <circle cx="60" cy="60" r="56" fill="url(#chocGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.15"/>
+  <g class="choc3d">
+    <polygon points="55,75 65,75 60,110" fill="#0d9488"/>
+    <ellipse cx="60" cy="66" rx="18" ry="24" fill="url(#feather3d)"/>
+    <ellipse cx="60" cy="68" rx="12" ry="16" fill="#facc15"/>
+    <circle cx="60" cy="40" r="18" fill="url(#feather3d)"/>
+    <circle cx="48" cy="44" r="5" fill="#ef4444"/>
+    <path d="M 66 32 C 86 38 78 52 66 50 Z" fill="#f97316"/>
+    <circle cx="57" cy="38" r="5.5" fill="#ffffff"/>
+    <circle cx="57" cy="38" r="3" fill="#0f172a"/>
+    <circle cx="58.5" cy="36.5" r="1.3" fill="#ffffff"/>
   </g>
 </svg>
 `)}`;
 
 const createRanaOjosRojosSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgR" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#15803d"/>
+    <radialGradient id="frogGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="50%" stop-color="#15803d"/>
       <stop offset="100%" stop-color="#0284c7"/>
+    </radialGradient>
+    <linearGradient id="frogSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#16a34a"/>
     </linearGradient>
+    <filter id="frogShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#0284c7" flood-opacity="0.4"/>
+    </filter>
   </defs>
   <style>
-    @keyframes frogEyeBlink { 0%, 88%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.1); } }
-    @keyframes croak { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    .frog { animation: croak 2s ease-in-out infinite; transform-origin: center; }
-    .redEye { animation: frogEyeBlink 3.2s infinite; transform-origin: center; }
+    @keyframes frogCroak { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+    @keyframes redEyeBlink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+    .frog3d { animation: frogCroak 2.2s ease-in-out infinite; transform-origin: 60px 60px; filter: url(#frogShadow); }
+    .redEye3d { animation: redEyeBlink 3.5s infinite; transform-origin: 60px 36px; }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgR)"/>
-  <g class="frog">
-    <path d="M 22 65 Q 10 50 25 45 Q 30 58 25 72 Z" fill="#22c55e"/>
-    <path d="M 78 65 Q 90 50 75 45 Q 70 58 75 72 Z" fill="#22c55e"/>
-    <circle cx="16" cy="45" r="3" fill="#ea580c"/>
-    <circle cx="84" cy="45" r="3" fill="#ea580c"/>
-    <ellipse cx="50" cy="56" rx="20" ry="18" fill="#22c55e"/>
-    <path d="M 32 52 Q 35 60 32 68" stroke="#38bdf8" stroke-width="4" fill="none"/>
-    <path d="M 68 52 Q 65 60 68 68" stroke="#38bdf8" stroke-width="4" fill="none"/>
-    <ellipse cx="50" cy="62" rx="11" ry="8" fill="#fef08a"/>
-    <ellipse cx="50" cy="42" rx="18" ry="12" fill="#22c55e"/>
-    <g class="redEye">
-      <circle cx="36" cy="30" r="10" fill="#dc2626"/>
-      <ellipse cx="36" cy="30" rx="2" ry="7" fill="#0f172a"/>
-      <circle cx="34" cy="27" r="1.5" fill="#ffffff"/>
-      <circle cx="64" cy="30" r="10" fill="#dc2626"/>
-      <ellipse cx="64" cy="30" rx="2" ry="7" fill="#0f172a"/>
-      <circle cx="62" cy="27" r="1.5" fill="#ffffff"/>
+  <circle cx="60" cy="60" r="56" fill="url(#frogGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.15"/>
+  <g class="frog3d">
+    <path d="M 28 75 C 12 58 30 52 32 82 Z" fill="#22c55e"/>
+    <path d="M 92 75 C 108 58 90 52 88 82 Z" fill="#22c55e"/>
+    <circle cx="20" cy="54" r="4" fill="#f97316"/>
+    <circle cx="100" cy="54" r="4" fill="#f97316"/>
+    <ellipse cx="60" cy="68" rx="24" ry="22" fill="url(#frogSkin)"/>
+    <path d="M 38 64 C 42 74 38 84 38 84" stroke="#38bdf8" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <path d="M 82 64 C 78 74 82 84 82 84" stroke="#38bdf8" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="60" cy="74" rx="14" ry="10" fill="#fef08a"/>
+    <ellipse cx="60" cy="50" rx="22" ry="15" fill="url(#frogSkin)"/>
+    <g class="redEye3d">
+      <circle cx="43" cy="36" r="12" fill="#dc2626"/>
+      <ellipse cx="43" cy="36" rx="2.5" ry="8" fill="#0f172a"/>
+      <circle cx="40.5" cy="32.5" r="2" fill="#ffffff"/>
+      <circle cx="77" cy="36" r="12" fill="#dc2626"/>
+      <ellipse cx="77" cy="36" rx="2.5" ry="8" fill="#0f172a"/>
+      <circle cx="74.5" cy="32.5" r="2" fill="#ffffff"/>
     </g>
   </g>
 </svg>
 `)}`;
 
 const createDantoTapirSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgD" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#334155"/>
+    <radialGradient id="tapGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="50%" stop-color="#334155"/>
       <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <linearGradient id="tapSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
     </linearGradient>
+    <filter id="tapShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.4"/>
+    </filter>
   </defs>
   <style>
-    @keyframes snout { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(8deg); } }
-    @keyframes earWiggle { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-6deg); } }
-    .snout { animation: snout 2s ease-in-out infinite; transform-origin: 50px 58px; }
-    .ear { animation: earWiggle 2.5s infinite; transform-origin: 32px 30px; }
+    @keyframes tapSnout { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(8deg); } }
+    .tap3d { animation: tapSnout 2.8s ease-in-out infinite; transform-origin: 60px 70px; filter: url(#tapShadow); }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgD)"/>
-  <ellipse cx="50" cy="62" rx="26" ry="20" fill="#475569"/>
-  <ellipse cx="50" cy="44" rx="20" ry="18" fill="#475569"/>
-  <ellipse class="ear" cx="32" cy="28" rx="6" ry="10" fill="#334155" stroke="#f1f5f9" stroke-width="1.5"/>
-  <ellipse cx="68" cy="28" rx="6" ry="10" fill="#334155" stroke="#f1f5f9" stroke-width="1.5"/>
-  <g class="snout">
-    <path d="M 42 52 C 42 68 58 68 58 52 Z" fill="#334155"/>
-    <ellipse cx="50" cy="64" rx="5" ry="3.5" fill="#f43f5e"/>
+  <circle cx="60" cy="60" r="56" fill="url(#tapGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.15"/>
+  <g class="tap3d">
+    <ellipse cx="38" cy="34" rx="7" ry="12" fill="#334155" stroke="#f8fafc" stroke-width="1.8"/>
+    <ellipse cx="82" cy="34" rx="7" ry="12" fill="#334155" stroke="#f8fafc" stroke-width="1.8"/>
+    <ellipse cx="60" cy="74" rx="30" ry="22" fill="url(#tapSkin)"/>
+    <ellipse cx="60" cy="52" rx="24" ry="20" fill="url(#tapSkin)"/>
+    <path d="M 50 62 C 50 82 70 82 70 62 Z" fill="#334155"/>
+    <ellipse cx="60" cy="76" rx="6" ry="4" fill="#fb7185"/>
+    <circle cx="48" cy="50" r="3.5" fill="#0f172a"/>
+    <circle cx="49" cy="49" r="1.2" fill="#ffffff"/>
+    <circle cx="72" cy="50" r="3.5" fill="#0f172a"/>
+    <circle cx="73" cy="49" r="1.2" fill="#ffffff"/>
   </g>
-  <circle cx="40" cy="42" r="3" fill="#0f172a"/>
-  <circle cx="41" cy="41" r="1" fill="#ffffff"/>
-  <circle cx="60" cy="42" r="3" fill="#0f172a"/>
-  <circle cx="61" cy="41" r="1" fill="#ffffff"/>
 </svg>
 `)}`;
 
 const createTiburonToroSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="bgS" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0284c7"/>
+    <radialGradient id="sharkGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#0284c7"/>
       <stop offset="100%" stop-color="#0c4a6e"/>
+    </radialGradient>
+    <linearGradient id="sharkSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <filter id="sharkShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#0c4a6e" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <style>
+    @keyframes sharkWag3d { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+    .shark3d { animation: sharkWag3d 2.8s ease-in-out infinite; transform-origin: 35px 60px; filter: url(#sharkShadow); }
+  </style>
+  <circle cx="60" cy="60" r="56" fill="url(#sharkGlow)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+  <ellipse cx="60" cy="22" rx="35" ry="12" fill="#ffffff" opacity="0.15"/>
+  <g class="shark3d">
+    <polygon points="22,60 8,38 15,60 8,82" fill="#1e293b"/>
+    <path d="M 20 60 Q 60 38 96 60 Q 60 82 20 60 Z" fill="url(#sharkSkin)"/>
+    <path d="M 30 60 Q 60 76 86 60 Q 60 66 30 60 Z" fill="#f8fafc"/>
+    <polygon points="54,46 62,22 74,46" fill="#1e293b"/>
+    <circle cx="84" cy="55" r="3" fill="#0f172a"/>
+    <circle cx="85" cy="54" r="1" fill="#ffffff"/>
+    <line x1="70" y1="55" x2="70" y2="63" stroke="#1e293b" stroke-width="2"/>
+    <line x1="74" y1="55" x2="74" y2="63" stroke="#1e293b" stroke-width="2"/>
+  </g>
+</svg>
+`)}`;
+
+const createBus3DSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="busBg" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </radialGradient>
+    <linearGradient id="busBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="windshield" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
     </linearGradient>
   </defs>
   <style>
-    @keyframes sharkWag { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
-    @keyframes floatBubbles { 0% { transform: translateY(0); opacity: 0; } 50% { opacity: 0.8; } 100% { transform: translateY(-35px); opacity: 0; } }
-    .shark { animation: sharkWag 2.4s ease-in-out infinite; transform-origin: 30px 50px; }
-    .b1 { animation: floatBubbles 2.8s infinite 0s; }
-    .b2 { animation: floatBubbles 2.8s infinite 1.4s; }
+    @keyframes busDrive { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    .bus3d { animation: busDrive 2.2s ease-in-out infinite; transform-origin: 60px 60px; }
   </style>
-  <circle cx="50" cy="50" r="48" fill="url(#bgS)"/>
-  <circle class="b1" cx="75" cy="60" r="3" fill="#ffffff" opacity="0.7"/>
-  <circle class="b2" cx="82" cy="75" r="4" fill="#ffffff" opacity="0.7"/>
-  <g class="shark">
-    <polygon points="18,50 6,32 12,50 6,68" fill="#334155"/>
-    <path d="M 16 50 Q 50 32 80 50 Q 50 68 16 50 Z" fill="#475569"/>
-    <path d="M 25 50 Q 50 64 72 50 Q 50 55 25 50 Z" fill="#f8fafc"/>
-    <polygon points="45,38 52,18 62,38" fill="#334155"/>
-    <polygon points="50,56 42,72 58,58" fill="#334155"/>
-    <circle cx="70" cy="46" r="2.5" fill="#0f172a"/>
-    <circle cx="70.8" cy="45.5" r="0.8" fill="#ffffff"/>
-    <line x1="58" y1="46" x2="58" y2="52" stroke="#334155" stroke-width="1.5"/>
-    <line x1="61" y1="46" x2="61" y2="52" stroke="#334155" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="56" fill="url(#busBg)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+  <g class="bus3d">
+    <rect x="30" y="32" width="60" height="54" rx="16" fill="url(#busBody)" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="36" y="38" width="48" height="22" rx="8" fill="url(#windshield)"/>
+    <ellipse cx="60" cy="42" rx="20" ry="4" fill="#ffffff" opacity="0.3"/>
+    <circle cx="44" cy="72" r="5" fill="#3b82f6"/>
+    <circle cx="44" cy="72" r="2" fill="#ffffff"/>
+    <circle cx="76" cy="72" r="5" fill="#3b82f6"/>
+    <circle cx="76" cy="72" r="2" fill="#ffffff"/>
+    <rect x="48" y="68" width="24" height="8" rx="3" fill="#1e293b"/>
+    <text x="60" y="74" text-anchor="middle" fill="#38bdf8" font-size="5" font-weight="900" font-family="sans-serif">NICAGO</text>
+  </g>
+</svg>
+`)}`;
+
+const createPassenger3DSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="passBg" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4c1d95"/>
+    </radialGradient>
+    <linearGradient id="skin3d" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+  </defs>
+  <style>
+    @keyframes passFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .pass3d { animation: passFloat 3s ease-in-out infinite; transform-origin: 60px 60px; }
+  </style>
+  <circle cx="60" cy="60" r="56" fill="url(#passBg)"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+  <g class="pass3d">
+    <path d="M 32 94 C 32 74 88 74 88 94 Z" fill="#0284c7"/>
+    <path d="M 52 76 L 68 76 L 60 94 Z" fill="#ffffff"/>
+    <circle cx="60" cy="52" r="24" fill="#fed7aa"/>
+    <circle cx="60" cy="42" r="24" fill="#1e1b4b"/>
+    <circle cx="60" cy="54" r="22" fill="#fed7aa"/>
+    <circle cx="34" cy="52" r="6" fill="#38bdf8"/>
+    <circle cx="86" cy="52" r="6" fill="#38bdf8"/>
+    <path d="M 34 52 C 34 32 86 32 86 52" stroke="#38bdf8" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="50" cy="54" r="3" fill="#0f172a"/>
+    <circle cx="70" cy="54" r="3" fill="#0f172a"/>
+    <circle cx="51" cy="53" r="1" fill="#ffffff"/>
+    <circle cx="71" cy="53" r="1" fill="#ffffff"/>
+    <path d="M 54 64 Q 60 68 66 64" stroke="#0f172a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
+`)}`;
+
+const createNicaBotCyberSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="cyberBg" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <linearGradient id="cyberHead" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="cyberGlow">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <style>
+    @keyframes cyberOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes cyberPulse { 0%, 100% { opacity: 0.85; transform: scale(1); } 50% { opacity: 1; transform: scale(1.04); } }
+    .orbitRing { animation: cyberOrbit 10s linear infinite; transform-origin: 60px 60px; }
+    .cyberBot { animation: cyberPulse 2.5s ease-in-out infinite; transform-origin: 60px 60px; filter: url(#cyberGlow); }
+  </style>
+  <circle cx="60" cy="60" r="56" fill="url(#cyberBg)"/>
+  <circle class="orbitRing" cx="60" cy="60" r="50" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="12 8" stroke-opacity="0.6"/>
+  <circle cx="60" cy="60" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+  <g class="cyberBot">
+    <line x1="60" y1="28" x2="60" y2="16" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="60" cy="14" r="5" fill="#06b6d4"/>
+    <circle cx="60" cy="14" r="2" fill="#ffffff"/>
+    <rect x="34" y="28" width="52" height="44" rx="20" fill="url(#cyberHead)" stroke="#94a3b8" stroke-width="2"/>
+    <rect x="38" y="38" width="44" height="22" rx="11" fill="#0f172a"/>
+    <rect x="40" y="40" width="40" height="18" rx="9" fill="url(#visorGrad)"/>
+    <circle cx="50" cy="49" r="3.5" fill="#ffffff"/>
+    <circle cx="70" cy="49" r="3.5" fill="#ffffff"/>
+    <path d="M 52 64 Q 60 68 68 64" stroke="#0284c7" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M 38 82 C 38 72 82 72 82 82 Z" fill="#0284c7"/>
+  </g>
+</svg>
+`)}`;
+
+const createCaptainConductorSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="capBg" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <linearGradient id="capHat" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <style>
+    @keyframes capFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .cap3d { animation: capFloat 3s ease-in-out infinite; transform-origin: 60px 60px; }
+  </style>
+  <circle cx="60" cy="60" r="56" fill="url(#capBg)"/>
+  <circle cx="60" cy="60" r="52" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="10 6" opacity="0.6"/>
+  <g class="cap3d">
+    <path d="M 30 96 C 30 76 90 76 90 96 Z" fill="#1e3a8a"/>
+    <polygon points="50,78 70,78 60,96" fill="#fbbf24"/>
+    <circle cx="60" cy="54" r="22" fill="#fed7aa"/>
+    <ellipse cx="60" cy="38" rx="26" ry="10" fill="url(#capHat)"/>
+    <path d="M 34 38 C 34 22 86 22 86 38 Z" fill="#2563eb"/>
+    <rect x="52" y="28" width="16" height="8" rx="2" fill="#fbbf24"/>
+    <circle cx="50" cy="54" r="3" fill="#0f172a"/>
+    <circle cx="70" cy="54" r="3" fill="#0f172a"/>
+    <path d="M 52 64 Q 60 69 68 64" stroke="#0f172a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M 40 46 Q 60 42 80 46" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.8"/>
   </g>
 </svg>
 `)}`;
 
 const NICARAGUA_FAUNA_AVATARS = [
   {
+    id: 'nicabot-cyber',
+    name: 'NicaBot AI Cyber 3D',
+    tag: 'Asistente IA NicaGo',
+    url: createNicaBotCyberSVG()
+  },
+  {
+    id: 'conductor-captain',
+    name: 'Capitán NicaGo 3D',
+    tag: 'Conductor Pro',
+    url: createCaptainConductorSVG()
+  },
+  {
     id: 'guardabarranco',
-    name: 'Guardabarranco',
+    name: 'Guardabarranco 3D',
     tag: 'Ave Nacional Nica',
     url: createGuardabarrancoSVG()
   },
   {
     id: 'jaguarete',
-    name: 'Jaguar / Jaguarete',
+    name: 'Jaguar 3D',
     tag: 'Bosawás & Indio Maíz',
     url: createJaguarSVG()
   },
   {
     id: 'monito-congo',
-    name: 'Mono Congo',
+    name: 'Mono Congo 3D',
     tag: 'Reserva Mombacho',
     url: createMonoCongoSVG()
   },
   {
     id: 'tortuga-paslama',
-    name: 'Tortuga Paslama',
+    name: 'Tortuga Paslama 3D',
     tag: 'Refugio La Flor',
     url: createTortugaSVG()
   },
   {
     id: 'chocoyo-verde',
-    name: 'Chocoyo Zapoyol',
+    name: 'Chocoyo Zapoyol 3D',
     tag: 'El Chocoyero',
     url: createChocoyoSVG()
   },
   {
     id: 'danto-tapir',
-    name: 'Danto / Tapir',
+    name: 'Danto / Tapir 3D',
     tag: 'Selva Indio Maíz',
     url: createDantoTapirSVG()
   },
   {
     id: 'rana-ojos-rojos',
-    name: 'Rana Ojos Rojos',
+    name: 'Rana Ojos Rojos 3D',
     tag: 'Selva Negra & Matagalpa',
     url: createRanaOjosRojosSVG()
   },
   {
     id: 'tiburon-lago',
-    name: 'Tiburón Toro',
+    name: 'Tiburón Toro 3D',
     tag: 'Lago Cocibolca',
     url: createTiburonToroSVG()
+  },
+  {
+    id: 'bus-express',
+    name: 'NicaGo Express 3D',
+    tag: 'Transporte Urbano',
+    url: createBus3DSVG()
+  },
+  {
+    id: 'pasajero-pro',
+    name: 'Viajero Pro 3D',
+    tag: 'Pasajero Inteligente',
+    url: createPassenger3DSVG()
   }
 ];
 
@@ -725,36 +984,36 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
         )}>
           <div>
             <div className="flex flex-col items-center text-center">
-              <div className="relative group pt-10 mb-1">
-                {/* Animated Speech Greeting Bubble (Duolingo style) */}
+              <div className="relative group pt-14 mb-2">
+                {/* High-Tech Animated Speech Greeting Bubble */}
                 <AnimatePresence>
                   {showGreetingBubble && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.5, y: 10, x: '-50%' }}
+                      initial={{ opacity: 0, scale: 0.5, y: -10, x: '-50%' }}
                       animate={{ opacity: 1, scale: 1, y: 0, x: '-50%' }}
-                      exit={{ opacity: 0, scale: 0.6, y: 8, transition: { duration: 0.2 } }}
+                      exit={{ opacity: 0, scale: 0.6, y: -6, transition: { duration: 0.2 } }}
                       onClick={() => setShowGreetingBubble(false)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full bg-white text-zinc-900 text-[11px] font-extrabold px-3.5 py-1.5 rounded-2xl shadow-lg border border-zinc-200 flex items-center gap-1.5 cursor-pointer select-none active:scale-95 transition-all z-30"
+                      whileHover={{ scale: 1.06 }}
+                      whileTap={{ scale: 0.94 }}
+                      className="absolute top-1 left-1/2 -translate-x-1/2 bg-gradient-to-r from-nic-blue via-sky-500 to-indigo-600 text-white text-[12px] font-extrabold px-4 py-2 rounded-full shadow-xl shadow-blue-500/25 border border-white/30 flex items-center gap-2 cursor-pointer select-none active:scale-95 transition-all z-30 whitespace-nowrap"
                     >
-                      <span>
+                      <span className="tracking-tight">
                         {language === 'es' ? '¡Hola' : language === 'zh' ? '你好' : 'Hello'}, {user.displayName?.split(' ')[0] || 'Pasajero'}!
                       </span>
                       <motion.span
-                        className="inline-block origin-[70%_70%]"
-                        animate={{ rotate: [0, 18, -10, 18, -10, 18, 0] }}
+                        className="inline-block origin-[70%_70%] text-sm"
+                        animate={{ rotate: [0, 20, -12, 20, -12, 20, 0] }}
                         transition={{
                           duration: 1.2,
                           repeat: Infinity,
-                          repeatDelay: 1.4,
+                          repeatDelay: 1.2,
                           ease: "easeInOut"
                         }}
                       >
                         👋
                       </motion.span>
                       {/* Speech Bubble Arrow pointing down to avatar */}
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-r border-b border-zinc-200" />
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-indigo-600 rotate-45 border-r border-b border-white/20" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -786,20 +1045,22 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                       e.stopPropagation();
                       setIsViewingAvatar(true);
                     }}
-                    className="w-20 h-20 rounded-3xl bg-nic-blue/5 flex items-center justify-center overflow-hidden border border-zinc-200 hover:border-nic-blue transition-all cursor-pointer relative shadow-inner block animate-fadeIn"
+                    className="w-24 h-24 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-nic-blue/40 ring-4 ring-blue-500/15 hover:ring-nic-blue/40 transition-all cursor-pointer relative shadow-xl block animate-fadeIn p-1 group"
                     title={language === 'es' ? 'Ver avatar / saludar' : 'View avatar / wave'}
                   >
-                    {editPhoto || user.photoURL ? (
-                      <img src={editPhoto || user.photoURL} alt={editName || user.displayName || ''} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                    ) : (
-                      <UserIcon size={32} className="text-nic-blue" />
-                    )}
-                    {/* Subtle Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity duration-200">
-                      <Eye size={18} className="text-white scale-90 group-hover:scale-100 transition-transform duration-200" />
-                      <span className="text-[7px] font-black uppercase tracking-wider mt-1 text-white/90">
-                        {language === 'es' ? 'Ver' : 'View'}
-                      </span>
+                    <div className="w-full h-full rounded-full overflow-hidden bg-zinc-50 relative flex items-center justify-center">
+                      {editPhoto || user.photoURL ? (
+                        <img src={editPhoto || user.photoURL} alt={editName || user.displayName || ''} referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-full" />
+                      ) : (
+                        <UserIcon size={36} className="text-nic-blue" />
+                      )}
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-zinc-950/45 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity duration-200 rounded-full">
+                        <Eye size={20} className="text-white scale-90 group-hover:scale-100 transition-transform duration-200" />
+                        <span className="text-[7px] font-black uppercase tracking-widest mt-0.5 text-white">
+                          {language === 'es' ? 'Ver' : 'View'}
+                        </span>
+                      </div>
                     </div>
                   </button>
                 </motion.div>
@@ -814,7 +1075,7 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
             </div>
 
             {/* Profile Menu Sub-tabs */}
-            <div className="mt-8 space-y-1.5">
+            <div className="mt-8 space-y-2">
               {[
                 { id: 'profile', label: 'Mi Perfil', icon: UserIcon },
                 { id: 'favorites', label: 'Favoritos', icon: Heart, count: favorites.length },
@@ -830,9 +1091,9 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                       setShowSubTabMobile(true);
                     }}
                     className={cn(
-                      "w-full flex items-center justify-between p-3.5 text-xs font-bold rounded-2xl transition-all cursor-pointer border",
+                      "w-full flex items-center justify-between px-4 py-3 text-xs font-bold rounded-full transition-all cursor-pointer border",
                       activeSubTab === subTab.id
-                        ? "bg-blue-50/70 text-nic-blue border-blue-200/80 shadow-2xs font-extrabold"
+                        ? "bg-blue-50/80 text-nic-blue border-blue-200 shadow-xs font-extrabold"
                         : "bg-white text-zinc-600 border-zinc-200/80 hover:bg-zinc-50 hover:text-zinc-900"
                     )}
                   >
@@ -862,7 +1123,7 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
           <div className="mt-8 pt-6 border-t border-zinc-200/60">
             <button 
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-full text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer active:scale-95 shadow-2xs border border-rose-100"
             >
               <LogOut size={14} />
               Cerrar Sesión
@@ -1110,15 +1371,15 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                     <div className="flex items-center gap-3">
                       <label 
                         htmlFor="avatar-upload-file"
-                        className="px-4 py-2.5 bg-white hover:bg-zinc-100 border border-zinc-300 hover:border-zinc-600 rounded-xl text-xs font-bold text-zinc-800 transition-all cursor-pointer flex items-center gap-2 shadow-xs active:scale-95"
+                        className="px-5 py-2.5 bg-white hover:bg-zinc-100 border border-zinc-300 hover:border-zinc-600 rounded-full text-xs font-bold text-zinc-800 transition-all cursor-pointer flex items-center gap-2 shadow-xs active:scale-95"
                       >
                         <Camera size={15} className="text-zinc-700" />
                         <span>Subir Foto Personal</span>
                       </label>
 
                       {editPhoto && !NICARAGUA_FAUNA_AVATARS.some(a => a.url === editPhoto) && (
-                        <div className="flex items-center gap-2 px-3 py-1 bg-zinc-100 border border-zinc-250 rounded-xl">
-                          <img src={editPhoto} alt="Personal" className="w-6 h-6 rounded-lg object-cover" />
+                        <div className="flex items-center gap-2 px-3.5 py-1 bg-zinc-100 border border-zinc-250 rounded-full">
+                          <img src={editPhoto} alt="Personal" className="w-6 h-6 rounded-full object-cover" />
                           <span className="text-[10px] font-bold text-zinc-800">Foto Personal Seleccionada</span>
                         </div>
                       )}
@@ -1176,7 +1437,7 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                 <div className="pt-4 border-t border-zinc-100 flex items-center justify-between gap-4">
                   <div>
                     {saveSuccess && (
-                      <span className="text-[11px] font-bold text-emerald-650 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full flex items-center gap-1.5 animate-fadeIn">
+                      <span className="text-[11px] font-bold text-emerald-650 bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 animate-fadeIn">
                         <CheckCircle size={12} className="text-emerald-500 fill-emerald-50" /> 
                         {language === 'es' ? '¡Perfil guardado con éxito!' : language === 'zh' ? '个人资料保存成功！' : 'Profile saved successfully!'}
                       </span>
@@ -1185,7 +1446,7 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                   <button
                     onClick={handleSaveProfile}
                     disabled={saving}
-                    className="px-6 py-3.5 bg-nic-blue text-white rounded-2xl text-[11px] font-black uppercase tracking-wider hover:bg-blue-600 active:scale-95 transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="px-7 py-3.5 bg-nic-blue text-white rounded-full text-[11px] font-black uppercase tracking-wider hover:bg-blue-600 active:scale-95 transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {saving ? (
                       <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />

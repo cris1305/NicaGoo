@@ -11,13 +11,12 @@ export const storage = getStorage(app);
 
 async function testConnection() {
   try {
-    // Graceful silent check for firestore connection without forcing server error logs on load
     const testDoc = doc(db, 'test', 'connection');
-    getDocFromServer(testDoc).catch(() => {
-      // Offline fallback handling silently
-    });
+    await getDocFromServer(testDoc);
   } catch (error) {
-    // Ignore initial connection warming errors
+    if (error instanceof Error && (error.message.includes('the client is offline') || error.message.includes('code=unavailable'))) {
+      console.warn("Firestore client operating in offline mode or connection warming up.");
+    }
   }
 }
 testConnection();

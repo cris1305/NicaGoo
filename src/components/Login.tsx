@@ -278,7 +278,7 @@ export default function Login({ onLogin }: LoginProps) {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                 </svg>
-                <span>{loading ? (t('login.signingIn') || 'Verificando...') : (t('login.googleBtn') || 'Entrar con Google')}</span>
+                <span>{loading ? (t('login.signingIn') || 'Iniciando...') : (t('login.googleBtn') || 'Iniciar Sesión con Google')}</span>
               </button>
             </div>
 
@@ -286,7 +286,7 @@ export default function Login({ onLogin }: LoginProps) {
             <div className="relative flex items-center justify-center my-1">
               <div className="flex-grow border-t border-slate-200"></div>
               <span className="flex-shrink mx-3 text-[10px] font-black tracking-widest uppercase text-slate-400">
-                {t('login.orForm') || 'O USA EL FORMULARIO'}
+                {t('login.orForm') || 'O INGRESA TUS DATOS'}
               </span>
               <div className="flex-grow border-t border-slate-200"></div>
             </div>
@@ -308,7 +308,7 @@ export default function Login({ onLogin }: LoginProps) {
                       <UserIcon size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                       <input 
                         type="text" 
-                        placeholder={t('login.usernamePlaceholder') || 'Usuario'}
+                        placeholder={t('login.usernamePlaceholder') || 'Nombre'}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         className="w-full pl-12 pr-5 py-3.5 rounded-full bg-slate-50 border border-slate-200/90 text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
@@ -343,7 +343,7 @@ export default function Login({ onLogin }: LoginProps) {
                     className="w-full py-4 text-white rounded-full font-black text-xs uppercase tracking-widest bg-[#0039a0] hover:bg-[#002f85] shadow-lg shadow-blue-900/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     <LogIn size={16} />
-                    <span>{loading ? (language === 'es' ? 'Ingresando...' : 'Loading...') : 'INICIAR SESIÓN LOCAL'}</span>
+                    <span>{loading ? (language === 'es' ? 'Iniciando sesión...' : 'Signing in...') : (language === 'es' ? 'INICIAR SESIÓN' : 'SIGN IN')}</span>
                   </button>
 
                   <div className="pt-1 text-center">
@@ -427,7 +427,7 @@ export default function Login({ onLogin }: LoginProps) {
                     </span>
                     <button
                       type="button"
-                      onClick={() => { setViewMode('register'); setError(''); }}
+                      onClick={() => { setViewMode('login'); setError(''); }}
                       className="text-xs font-black uppercase tracking-wider text-[#0039a0] hover:underline transition-colors cursor-pointer"
                     >
                       {language === 'es' ? 'Iniciar Sesión' : 'Sign In'}

@@ -38,6 +38,7 @@ import Login from './components/Login';
 import { seedDatabase, clearDatabase } from './services/seedService';
 import { auth, db } from './firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from './lib/firestoreErrorHandler';
 import { useLanguage } from './lib/LanguageContext';
 import UserReportModule from './components/UserReportModule';
 
@@ -262,13 +263,13 @@ export default function App() {
     });
 
     // Real-time feeds for system context
-    const unsubRoutes = onSnapshot(collection(db, 'routes'), s => setRoutes(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Route))), (error) => console.error("Error routes:", error));
-    const unsubDrivers = onSnapshot(collection(db, 'drivers'), s => setDrivers(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Driver))), (error) => console.error("Error drivers:", error));
+    const unsubRoutes = onSnapshot(collection(db, 'routes'), s => setRoutes(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Route))), (error) => handleFirestoreError(error, OperationType.GET, 'routes'));
+    const unsubDrivers = onSnapshot(collection(db, 'drivers'), s => setDrivers(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Driver))), (error) => handleFirestoreError(error, OperationType.GET, 'drivers'));
     const unsubStops = onSnapshot(collection(db, 'stops'), s => {
       const docs = s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Stop));
       setStops(docs);
-    }, (error) => console.error("Error stops:", error));
-    const unsubSchedules = onSnapshot(collection(db, 'schedules'), s => setSchedules(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Schedule))), (error) => console.error("Error schedules:", error));
+    }, (error) => handleFirestoreError(error, OperationType.GET, 'stops'));
+    const unsubSchedules = onSnapshot(collection(db, 'schedules'), s => setSchedules(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Schedule))), (error) => handleFirestoreError(error, OperationType.GET, 'schedules'));
 
     return () => {
       unsubAuth();
