@@ -409,7 +409,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-4 md:p-6 pb-20">
+      <main className={cn("max-w-7xl mx-auto p-4 md:p-6 pb-20", activeTab === 'map' && "p-2 sm:p-4 md:p-6 pb-12 sm:pb-20")}>
         <AnimatePresence mode="wait">
           {activeTab === 'admin' ? (
             <motion.div
@@ -762,10 +762,11 @@ export default function App() {
 
               {/* Right Panel: Full screen map container */}
               <div className={cn(
-                selectedRoute ? "lg:col-span-8 h-[550px] lg:h-auto min-h-[480px]" : "lg:col-span-12 h-[600px] lg:h-[650px] w-full min-h-[500px]",
-                "rounded-3xl overflow-hidden border border-zinc-200/80 shadow-md relative bg-zinc-100",
+                selectedRoute ? "lg:col-span-8 h-[550px] lg:h-auto min-h-[480px]" : "lg:col-span-12 h-[600px] lg:h-[680px] w-full min-h-[500px]",
+                "rounded-2xl sm:rounded-3xl overflow-hidden border border-zinc-200/80 shadow-md relative bg-zinc-100 w-full",
                 isMobile && selectedRoute && mobileMapTab !== 'map' && "hidden lg:block",
-                isMobile && !selectedRoute && "h-[450px]"
+                isMobile && !selectedRoute && "h-[calc(100dvh-130px)] min-h-[450px] max-h-[850px]",
+                isMobile && selectedRoute && mobileMapTab === 'map' && "h-[calc(100dvh-180px)] min-h-[450px] max-h-[850px]"
               )}>
                 <MapView 
                   origin={origin} 

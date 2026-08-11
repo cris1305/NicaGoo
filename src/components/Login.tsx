@@ -30,6 +30,7 @@ export default function Login({ onLogin }: LoginProps) {
   const [regName, setRegName] = useState('');
   const [regPhone, setRegPhone] = useState('');
   const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,16 +50,17 @@ export default function Login({ onLogin }: LoginProps) {
       return;
     }
 
-    // 2. Otherwise we check if they are entering their registered/custom phone number as passenger
+    // 2. Otherwise we check if they are entering their registered/custom phone number or email as passenger
     setLoading(true);
     try {
-      const q = query(collection(db, 'users'), where('phoneNumber', '==', inputUser));
-      const snap = await getDocs(q);
+      let snap = await getDocs(query(collection(db, 'users'), where('phoneNumber', '==', inputUser)));
+      if (snap.empty) {
+        snap = await getDocs(query(collection(db, 'users'), where('email', '==', inputUser)));
+      }
 
       if (snap.empty) {
-        // If they wrote a password, maybe they got admin credentials wrong
         if (password) {
-          setError(t('login.errorNotFound'));
+          setError(language === 'es' ? 'Usuario o número no encontrado. Revisa tus datos o crea una cuenta.' : 'User or phone number not found. Check your details or register.');
         } else {
           setError(t('login.errorNotRegistered'));
         }
@@ -68,6 +70,15 @@ export default function Login({ onLogin }: LoginProps) {
 
       const userDoc = snap.docs[0].data();
       const userId = snap.docs[0].id;
+
+      // Check password if configured on user record
+      if (userDoc.password) {
+        if (!password || password.trim() !== userDoc.password) {
+          setError(language === 'es' ? 'Contraseña incorrecta. Por favor intenta de nuevo.' : 'Incorrect password. Please try again.');
+          setLoading(false);
+          return;
+        }
+      }
 
       // Save credentials locally
       localStorage.setItem('localAuth', 'user');
@@ -92,9 +103,15 @@ export default function Login({ onLogin }: LoginProps) {
     const name = regName.trim();
     const phone = regPhone.trim();
     const email = regEmail.trim();
+    const pwd = regPassword.trim();
 
-    if (!name || !phone) {
-      setError(t('login.errorRequired'));
+    if (!name || !phone || !pwd) {
+      setError(language === 'es' ? 'Por favor completa todos los campos requeridos, incluyendo la contraseña.' : 'Please fill all required fields, including password.');
+      return;
+    }
+
+    if (pwd.length < 4) {
+      setError(language === 'es' ? 'La contraseña debe tener al menos 4 caracteres.' : 'Password must be at least 4 characters long.');
       return;
     }
 
@@ -110,11 +127,12 @@ export default function Login({ onLogin }: LoginProps) {
         return;
       }
 
-      // Record passenger document
+      // Record passenger document with password
       const newUserDoc = {
         name,
         phoneNumber: phone,
         email: email || '',
+        password: pwd,
         role: 'passenger',
         photoUrl: '',
         createdAt: new Date().toISOString()
@@ -390,6 +408,19 @@ export default function Login({ onLogin }: LoginProps) {
                         onChange={(e) => setRegPhone(e.target.value)}
                         className="w-full pl-12 pr-5 py-3.5 rounded-full bg-slate-50 border border-slate-200/90 text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
                         required
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                      <input 
+                        type="password" 
+                        placeholder={language === 'es' ? 'Crea tu contraseña (Obligatoria)' : 'Create password (Required)'}
+                        value={regPassword}
+                        onChange={(e) => setRegPassword(e.target.value)}
+                        className="w-full pl-12 pr-5 py-3.5 rounded-full bg-slate-50 border border-slate-200/90 text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+                        required
+                        minLength={4}
                       />
                     </div>
 

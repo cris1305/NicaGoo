@@ -75,6 +75,21 @@
   font-family: inherit !important;
 }
 
+/* Real-time continuous polyline scaling during zoom (Google Maps style) */
+.leaflet-zoom-animated {
+  will-change: transform;
+}
+
+.leaflet-overlay-pane canvas,
+.leaflet-overlay-pane svg {
+  transform-origin: 0 0 !important;
+  will-change: transform !important;
+}
+
+.leaflet-zoom-hide {
+  visibility: visible !important;
+}
+
 .leaflet-control-zoom {
   border: none !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;

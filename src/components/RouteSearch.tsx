@@ -8,125 +8,42 @@ import ReportForm from './ReportForm';
 import { RouteService } from '../services/routeService';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../lib/LanguageContext';
+import ometepeImg from '../assets/images/ometepe_nicaragua_1786487925454.jpg';
+import granadaImg from '../assets/images/granada_nicaragua_1786487935977.jpg';
 
 const DEFAULT_TOURIST_POSTS: TouristPost[] = [
   {
-    id: 'post-1',
-    title: 'Puerto Salvador Allende',
-    subtitle: 'Malecón & Paseo del Lago Xolotlán - Managua',
-    description: 'El destino turístico #1 de Managua a orillas del Lago Xolotlán. Ofrece restaurantes gastronómicos, paseos en barco, pista de Go Karts, áreas infantiles, quioscos de helados y vistas espectaculares al atardecer.',
-    category: 'Puerto & Recreación',
-    coverPhoto: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800',
-    galleryPhotos: [
-      'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'
-    ],
-    schedule: 'Lunes a Domingo: 8:00 AM - 11:00 PM',
-    entryFee: 'C$ 10 Córdobas',
-    destinationStopName: 'Bahía Puerto Salvador Allende (Dupla Norte)',
-    recommendedRoutes: ['Ruta 101', 'Ruta 120'],
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'post-2',
-    title: 'Hotel Real InterContinental Metrocentro',
-    subtitle: 'Zona Financiera & Comercial de Managua',
-    description: 'Alojamiento de lujo de 5 estrellas en pleno corazón gastronómico y comercial de Managua. Cuenta con restaurantes internacionales, piscina tropical, centro de convenciones y acceso directo al Centro Comercial Metrocentro.',
-    category: 'Hoteles & Hospedajes',
-    coverPhoto: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
-    galleryPhotos: [
-      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&q=80&w=800'
-    ],
-    schedule: 'Recepción 24 Horas',
-    entryFee: 'Tarifa según habitación / consumo',
-    destinationStopName: 'Bahía Metrocentro (Rotonda Rubén Darío)',
-    recommendedRoutes: ['Ruta 110', 'Ruta 114', 'Ruta 119'],
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'post-3',
-    title: 'Restaurante & Fritanga La Granja Nica',
-    subtitle: 'Gastronomía Típica Nicaragüense - Managua',
-    description: 'Icono culinario en Managua famoso por sus carnes asadas a las brasas, vigorón en hoja de plátano, tajadas con queso, nacatamales los fines de semana y refresco de chicha de maíz y cacao.',
-    category: 'Restaurantes & Fritangas',
-    coverPhoto: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800',
-    galleryPhotos: [
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800'
-    ],
-    schedule: 'Lunes a Sábado: 11:00 AM - 10:00 PM',
-    entryFee: 'Platos desde C$ 120',
-    destinationStopName: 'Bahía Rotonda La Virgen (Pista Larreynaga)',
-    recommendedRoutes: ['Ruta 105', 'Ruta 117'],
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'post-4',
-    title: 'Lomas de Tiscapa & Canopy Extremo',
-    subtitle: 'Reserva Natural & Mirador Histórico',
-    description: 'Mirador histórico e icónico ubicado sobre el borde del cráter volcánico de la Laguna de Tiscapa. Disfruta de la silueta del General Sandino, vista de 360° a toda Managua y el canopy tirolesa más veloz de la capital.',
+    id: 'post-ometepe',
+    title: 'Isla de Ometepe & Volcán Concepción',
+    subtitle: 'Maravilla Natural en el Lago Cocibolca - Rivas',
+    description: 'Espectacular isla paradisíaca formada por dos majestuosos volcanes en el Lago de Nicaragua. Disfruta de la Reserva Charco Verde, la manantial natural Ojo de Agua, la cascada San Ramón y senderismo volcánico único en Centroamérica.',
     category: 'Sitios Turísticos',
-    coverPhoto: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800',
+    coverPhoto: ometepeImg,
     galleryPhotos: [
-      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=800'
+      ometepeImg,
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'
     ],
-    schedule: 'Todos los días: 6:00 AM - 6:00 PM',
-    entryFee: 'Gratis (Canopy C$ 150)',
-    destinationStopName: 'Bahía Plaza Inter (Lomas de Tiscapa)',
-    recommendedRoutes: ['Ruta 105', 'Ruta 125'],
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'post-5',
-    title: 'Palacio Nacional de la Cultura & Plaza de la Revolución',
-    subtitle: 'Centro Histórico & Museo Nacional de Nicaragua',
-    description: 'Imponente monumento de arquitectura neoclásica frente a la antigua Catedral de Managua. Alberga las salas del Museo Nacional con piezas cerámicas prehispánicas, pinacoteca nacional y salones gubernamentales históricos.',
-    category: 'Cultura & Museos',
-    coverPhoto: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800',
-    galleryPhotos: [
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800'
-    ],
-    schedule: 'Martes a Domingo: 8:00 AM - 5:00 PM',
-    entryFee: 'C$ 20 Nacionales / $5 Extranjeros',
-    destinationStopName: 'Bahía Palacio Nacional (Plaza de la Revolución)',
-    recommendedRoutes: ['Ruta 114', 'Ruta 101'],
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'post-6',
-    title: 'Hotel Crowne Plaza Managua',
-    subtitle: 'Diseño Piramidal & Centro de Convenciones',
-    description: 'Emblemático hotel piramidal inspirado en las ruinas mayas. Punto focal para convenciones de negocios, bodas y eventos internacionales en el centro de Managua.',
-    category: 'Hoteles & Hospedajes',
-    coverPhoto: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800',
-    galleryPhotos: [
-      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800'
-    ],
-    schedule: 'Atención 24 Horas',
-    entryFee: 'Reserva previa',
-    destinationStopName: 'Bahía Plaza Inter (Lomas de Tiscapa)',
-    recommendedRoutes: ['Ruta 105', 'Ruta 125'],
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'post-7',
-    title: 'Mercado Artesanal Roberto Huembes & Comedores',
-    subtitle: 'Feria de Artesanías & Gastronomía Popular',
-    description: 'El mayor centro artesanal y gastronómico popular de Managua: hamacas teñidas a mano de Masaya, marroquinería en cuero genuino, calzado y tramos de comida casera nicaragüense.',
-    category: 'Restaurantes & Fritangas',
-    coverPhoto: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&q=80&w=800',
-    galleryPhotos: [
-      'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&q=80&w=800',
-      'https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?auto=format&fit=crop&q=80&w=800'
-    ],
-    schedule: 'Lunes a Sábado: 7:00 AM - 6:00 PM',
-    entryFee: 'Entrada Libre',
-    destinationStopName: 'Bahía Mercado Roberto Huembes (Pista Solidaridad)',
+    schedule: 'Ferry San Jorge -> Ometepe: 6:00 AM - 5:30 PM',
+    entryFee: 'Ferry desde C$ 50 / Ojo de Agua $5',
+    destinationStopName: 'Puerto de San Jorge (Conexión Mercado Roberto Huembes / Rivas)',
     recommendedRoutes: ['Ruta 110', 'Ruta 133'],
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'post-granada',
+    title: 'Granada Colonial & Isletas del Lago',
+    subtitle: 'Patrimonio Histórico & Culinario de Nicaragua',
+    description: 'La joya colonial de Nicaragua con sus icónicas fachadas coloridas, catedrales históricas, paseos en carruaje de caballos y recorridos en lancha por las 365 Isletas del Lago Xolotlán y Cocibolca.',
+    category: 'Sitios Turísticos',
+    coverPhoto: granadaImg,
+    galleryPhotos: [
+      granadaImg,
+      'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800'
+    ],
+    schedule: 'Todos los días - Tours de 8:00 AM a 6:00 PM',
+    entryFee: 'Paseo en lancha desde C$ 150',
+    destinationStopName: 'Terminal de Buses Granada (Mercado Roberto Huembes)',
+    recommendedRoutes: ['Ruta 110', 'Ruta 105'],
     createdAt: new Date().toISOString()
   }
 ];
@@ -315,16 +232,16 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
     };
   }, []);
 
-  const handleSearch = async (overrideDest?: string) => {
+  const handleSearch = async (overrideDest?: unknown) => {
     setLoading(true);
-    const targetDestName = overrideDest !== undefined ? overrideDest : destText;
-    if (overrideDest !== undefined) {
+    const targetDestName = typeof overrideDest === 'string' ? overrideDest : String(destText || '');
+    if (typeof overrideDest === 'string') {
       setDestText(overrideDest);
     }
     
     // Resolve coordinates based on names for demo using the 10 most common locations of Managua
     const resolveCoords = (text: string, defaultVal: { lat: number; lng: number }) => {
-      const lower = text.toLowerCase();
+      const lower = String(text || '').toLowerCase();
       if (lower.includes('plaza inter') || lower.includes('inter')) {
         return { lat: 12.1444, lng: -86.2724 };
       }
@@ -358,7 +275,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
       return defaultVal;
     };
 
-    const cleanOrigin = originText.trim().toLowerCase();
+    const cleanOrigin = String(originText || '').trim().toLowerCase();
     const cleanDest = targetDestName.trim().toLowerCase();
 
     let matchedOriginStop = stops.find(s => s.name.toLowerCase() === cleanOrigin);
@@ -390,19 +307,95 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
     onOriginChange(mockOrigin);
     onDestinationChange(mockDest);
 
-    const results = await RouteService.findBestRoutes(mockOrigin, mockDest);
-    setOptions(results);
-    setHasSearched(true);
-    setLoading(false);
+    try {
+      const results = await RouteService.findBestRoutes(mockOrigin, mockDest);
+      
+      if (results.length > 0) {
+        setOptions(results);
+      } else if (routes.length > 0) {
+        // Fallback: if no direct stop sequence was matched, return matching routes or default active routes so user ALWAYS gets route options!
+        const searchTerms = [originText, targetDestName].map(s => s.toLowerCase().trim()).filter(Boolean);
+        const fallbackRoutes = routes.filter(r => {
+          if (searchTerms.length === 0) return true;
+          return searchTerms.some(term => 
+            (r.name && r.name.toLowerCase().includes(term)) ||
+            (r.code && r.code.toLowerCase().includes(term))
+          );
+        });
 
-    const currentUserId = auth.currentUser ? auth.currentUser.uid : (localStorage.getItem('localAuth') ? (localStorage.getItem('localAuth_id') || ('local-' + localStorage.getItem('localAuth'))) : null);
-    if (currentUserId) {
-      await addDoc(collection(db, 'history'), {
-        userId: currentUserId,
-        origin: mockOrigin.address,
-        destination: mockDest.address,
-        createdAt: new Date().toISOString()
-      });
+        const selectedList = fallbackRoutes.length > 0 ? fallbackRoutes : routes.slice(0, 5);
+        const generatedOptions: RouteOption[] = selectedList.map((r, idx) => {
+          const items = routeStops.filter(rs => rs.routeId === r.id).sort((a,b) => a.sequence - b.sequence);
+          const firstStop = stops.find(s => s.id === items[0]?.stopId);
+          const lastStop = stops.find(s => s.id === items[items.length - 1]?.stopId);
+
+          return {
+            steps: [
+              {
+                type: 'board',
+                routeId: r.id,
+                stopId: items[0]?.stopId || 'stop-1',
+                description: `Aborda la unidad ${r.code || r.name} en ${firstStop?.name || originText || 'Parada inicial'}`,
+                time: '06:00'
+              },
+              {
+                type: 'ride',
+                routeId: r.id,
+                stopId: items[items.length - 1]?.stopId || 'stop-2',
+                description: `Viaja en ${r.name} hasta ${lastStop?.name || targetDestName || 'Destino'}`
+              }
+            ],
+            totalStops: items.length || 8,
+            estimatedTimeMinutes: (items.length || 8) * 3 + 5,
+            etaToBoardMinutes: 3 + (idx * 2)
+          };
+        });
+        setOptions(generatedOptions);
+      } else {
+        setOptions([]);
+      }
+    } catch (err) {
+      console.error("Error searching routes:", err);
+      if (routes.length > 0) {
+        const fallbackOptions: RouteOption[] = routes.slice(0, 4).map((r, idx) => ({
+          steps: [
+            {
+              type: 'board',
+              routeId: r.id,
+              stopId: 'stop-1',
+              description: `Aborda la unidad ${r.code || r.name}`,
+              time: '06:00'
+            },
+            {
+              type: 'ride',
+              routeId: r.id,
+              stopId: 'stop-2',
+              description: `Viaja en ${r.name}`
+            }
+          ],
+          totalStops: 8,
+          estimatedTimeMinutes: 25,
+          etaToBoardMinutes: 4 + idx
+        }));
+        setOptions(fallbackOptions);
+      }
+    } finally {
+      setHasSearched(true);
+      setLoading(false);
+    }
+
+    try {
+      const currentUserId = auth.currentUser ? auth.currentUser.uid : (localStorage.getItem('localAuth') ? (localStorage.getItem('localAuth_id') || ('local-' + localStorage.getItem('localAuth'))) : null);
+      if (currentUserId) {
+        await addDoc(collection(db, 'history'), {
+          userId: currentUserId,
+          origin: mockOrigin.address,
+          destination: mockDest.address,
+          createdAt: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.error("Error logging search history:", err);
     }
   };
 
@@ -690,6 +683,22 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
               )}
             </button>
       </motion.div>
+
+      {hasSearched && (
+        <div className="flex items-center justify-between px-1">
+          <button 
+            onClick={() => {
+              setHasSearched(false);
+              setOptions([]);
+              setDestText('');
+            }}
+            className="text-xs font-black text-nic-blue hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-full border border-blue-200 flex items-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+          >
+            <ChevronLeft size={16} />
+            <span>Limpiar búsqueda y ver publicaciones turísticas</span>
+          </button>
+        </div>
+      )}
 
       {options.length > 0 && (
         <div className="space-y-4">
@@ -1007,8 +1016,8 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
             </motion.div>
         </div>
       )}
-      {/* Tourist Promotional Posts Vertical Facebook-Style Feed (Always visible on search tab) */}
-      {activeTab === 'search' && (
+      {/* Tourist Promotional Posts Vertical Facebook-Style Feed (Visible when search is not active) */}
+      {activeTab === 'search' && !hasSearched && (
         <div className="pt-8 border-t border-zinc-200 space-y-6 text-left">
           {/* Feed Title & Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">

@@ -338,6 +338,8 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
     if (!mapContainerRef.current) return;
 
     // Initialize map with explicit dragging and touch interaction options
+    const customCanvasRenderer = L.canvas({ padding: 0.5 });
+
     const map = L.map(mapContainerRef.current, {
       zoomControl: false,
       attributionControl: false,
@@ -351,7 +353,12 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
       bearing: 0,
       rotateControl: false, // Only show our premium custom UI
       touchRotate: true, // Enable direct two-finger pinch gesture to rotate map naturally!
-      renderer: L.svg() // Render using standard SVG to allow flawless, lag-free hardware-accelerated scaling and rotation on mobile pinch zoom gestures
+      zoomAnimation: true,
+      fadeAnimation: true,
+      markerZoomAnimation: true,
+      zoomSnap: 0, // Continuous fluid zoom matching Google Maps behavior
+      zoomDelta: 0.25,
+      renderer: customCanvasRenderer
     } as any).setView([12.1364, -86.2514], 13); // Managua center
 
     // Explicitly guarantee dragging is enabled
@@ -389,14 +396,8 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
     locationMarkersGroupRef.current = locationMarkersGroup;
     busMarkersGroupRef.current = busMarkersGroup;
 
-    // Track active move/zoom changes to keep compass and coordinates HUD synced
+    // Track active zoom changes to keep HUD synced without unnecessary high-frequency re-renders during drag
     setZoomLevel(map.getZoom());
-    setMapCenter({ lat: map.getCenter().lat, lng: map.getCenter().lng });
-
-    map.on('move', () => {
-      const center = map.getCenter();
-      setMapCenter({ lat: center.lat, lng: center.lng });
-    });
 
     map.on('zoomend', () => {
       setZoomLevel(map.getZoom());
@@ -424,15 +425,31 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
     const container = mapContainerRef.current;
     if (!container || !mapRef.current) return;
 
-    const resizeObserver = new ResizeObserver(() => {
+    const invalidate = () => {
       if (mapRef.current) {
         mapRef.current.invalidateSize();
       }
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      invalidate();
     });
 
     resizeObserver.observe(container);
+
+    // Initial timeout invalidation to fix mobile viewport rendering gaps
+    const timer1 = setTimeout(invalidate, 150);
+    const timer2 = setTimeout(invalidate, 500);
+
+    window.addEventListener('resize', invalidate);
+    window.addEventListener('orientationchange', invalidate);
+
     return () => {
       resizeObserver.unobserve(container);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      window.removeEventListener('resize', invalidate);
+      window.removeEventListener('orientationchange', invalidate);
     };
   }, []);
 
@@ -633,13 +650,16 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
     const activePath = streetPath.length > 1 ? streetPath : pathStraight;
 
     if (activePath.length > 1) {
+      const canvasRenderer = L.canvas({ padding: 0.5 });
+
       // Glow background line for beautiful aesthetics
       const glowLine = L.polyline(activePath, {
         color: '#0033a0',
         weight: 9,
         opacity: 0.15,
         lineCap: 'round',
-        lineJoin: 'round'
+        lineJoin: 'round',
+        renderer: canvasRenderer
       });
 
       // Main line in high contrast blue
@@ -648,7 +668,8 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
         weight: 4,
         opacity: 0.95,
         lineCap: 'round',
-        lineJoin: 'round'
+        lineJoin: 'round',
+        renderer: canvasRenderer
       });
 
       group.addLayer(glowLine);
