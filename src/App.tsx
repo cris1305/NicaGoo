@@ -265,7 +265,14 @@ export default function App() {
     });
 
     // Real-time feeds for system context
-    const unsubRoutes = onSnapshot(collection(db, 'routes'), s => setRoutes(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Route))), (error) => handleFirestoreError(error, OperationType.GET, 'routes'));
+    const unsubRoutes = onSnapshot(collection(db, 'routes'), async (s) => {
+      const docs = s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Route));
+      setRoutes(docs);
+      if (s.empty) {
+        console.log("Database empty. Auto-seeding 5 connection points dataset...");
+        await seedDatabase();
+      }
+    }, (error) => handleFirestoreError(error, OperationType.GET, 'routes'));
     const unsubDrivers = onSnapshot(collection(db, 'drivers'), s => setDrivers(s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Driver))), (error) => handleFirestoreError(error, OperationType.GET, 'drivers'));
     const unsubStops = onSnapshot(collection(db, 'stops'), s => {
       const docs = s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Stop));

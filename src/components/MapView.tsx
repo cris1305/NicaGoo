@@ -415,8 +415,18 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
     });
 
     return () => {
-      map.remove();
-      mapRef.current = null;
+      if (mapRef.current) {
+        const mapToDestroy = mapRef.current;
+        mapRef.current = null;
+        setTimeout(() => {
+          try {
+            mapToDestroy.off();
+            mapToDestroy.remove();
+          } catch (err) {
+            console.warn("Leaflet map cleanup ignored:", err);
+          }
+        }, 0);
+      }
     };
   }, []);
 

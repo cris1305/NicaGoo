@@ -63,7 +63,10 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
 
   const getSuggestionType = (name: string) => {
     const isStop = stops.some(s => s.name.toLowerCase() === name.toLowerCase());
-    return isStop ? 'stop' : 'landmark';
+    const isRoute = routes.some(r => r.name.toLowerCase() === name.toLowerCase());
+    if (isStop) return 'stop';
+    if (isRoute) return 'route';
+    return 'landmark';
   };
 
   const highlightMatch = (text: string, query: string) => {
@@ -86,22 +89,23 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
     );
   };
 
-  const defaultSuggestions = [
-    "Plaza Inter",
-    "Puerto Salvador Allende",
-    "Metrocentro",
-    "UCA (Universidad Centroamericana)",
-    "Multicentro Las Américas",
-    "Galerías Santo Domingo",
-    "Linda Vista",
-    "Mercado Roberto Huembes",
-    "Palacio Nacional",
-    "Bello Horizonte"
-  ];
-
   const getFilteredSuggestions = (input: string) => {
-    const suggestionsFromStops = stops.map(s => s.name);
-    const combined = Array.from(new Set([...defaultSuggestions, ...suggestionsFromStops]));
+    // Only suggest places, stops, tourist destinations, and routes registered in the app
+    const stopNames = stops.map(s => s.name);
+    const touristTitles = touristPosts.flatMap(p => [p.title, p.destinationStopName].filter(Boolean) as string[]);
+    const routeNames = routes.map(r => r.name);
+    
+    let combined = Array.from(new Set([...stopNames, ...touristTitles, ...routeNames]));
+    if (combined.length === 0) {
+      combined = [
+        "Bahía UCA (Pista Juan Pablo II)",
+        "Bahía Metrocentro (Avenida de Masaya)",
+        "Bahía Plaza Inter (Lomas de Tiscapa)",
+        "Bahía Puerto Salvador Allende (Dupla Norte)",
+        "Bahía Mercado Roberto Huembes (Pista Solidaridad)"
+      ];
+    }
+
     if (!input.trim()) {
       return combined.slice(0, 10);
     }
@@ -296,6 +300,18 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
         const nameLower = s.name.toLowerCase();
         return nameLower.includes(cleanDest) || cleanDest.includes(nameLower) || s.id.toLowerCase() === cleanDest;
       });
+    }
+
+    if (!matchedDestStop && cleanDest) {
+      const matchedPost = touristPosts.find(p => 
+        p.title.toLowerCase().includes(cleanDest) || 
+        cleanDest.includes(p.title.toLowerCase()) || 
+        (p.destinationStopName && (p.destinationStopName.toLowerCase().includes(cleanDest) || cleanDest.includes(p.destinationStopName.toLowerCase())))
+      );
+      if (matchedPost && matchedPost.destinationStopName) {
+        const destNameLower = matchedPost.destinationStopName.toLowerCase();
+        matchedDestStop = stops.find(s => s.name.toLowerCase().includes(destNameLower) || destNameLower.includes(s.name.toLowerCase()));
+      }
     }
 
     let originCoords = matchedOriginStop 
@@ -1353,21 +1369,14 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
 
                 {/* Opción 2: Parada o Bahía general */}
                 <div className="space-y-2">
-                  <p className="text-[11px] font-black uppercase tracking-wider text-zinc-500">🏣 Selecciona una bahía o parada de partida:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
+                  <p className="text-[11px] font-black uppercase tracking-wider text-zinc-500">🏣 Selecciona uno de los 5 Puntos de Conexión o Bahías de partida:</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
                     {[
-                      "UCA / Universidad Centroamericana",
-                      "Metrocentro",
-                      "Plaza Inter / Catedral",
-                      "Mercado Roberto Huembes",
-                      "Mercado Oriental",
-                      "Rotonda Bello Horizonte",
-                      "Linda Vista",
-                      "Multicentro Las Américas",
-                      "Galerías Santo Domingo",
-                      "UNAN Managua",
-                      "Terminal Israel Lewites",
-                      "Rotonda Jean Paul Genie"
+                      "Bahía UCA (Pista Juan Pablo II)",
+                      "Bahía Metrocentro (Avenida de Masaya)",
+                      "Bahía Plaza Inter (Lomas de Tiscapa)",
+                      "Bahía Puerto Salvador Allende (Dupla Norte)",
+                      "Bahía Mercado Roberto Huembes (Pista Solidaridad)"
                     ].map((stopName, idx) => (
                       <button
                         key={idx}

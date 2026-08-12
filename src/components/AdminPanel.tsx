@@ -3370,26 +3370,27 @@ export default function AdminPanel() {
                 {/* DB Actions Content */}
                 <div className="space-y-4">
                   <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/50">
-                    <h4 className="text-[10px] font-black text-zinc-900 uppercase tracking-widest mb-1.5">Datos Demostrativos</h4>
+                    <h4 className="text-[10px] font-black text-zinc-900 uppercase tracking-widest mb-1.5">5 Puntos de Conexión</h4>
                     <p className="text-[11px] text-zinc-500 leading-relaxed mb-4">
-                      ¿Deseas poblar la base de datos con rutas predefinidas, paradas, choferes y horarios para pruebas de viaje?
+                      Recrea exactamente los 5 puntos de conexión principales (UCA, Metrocentro, Plaza Inter, Puerto Salvador Allende, Mercado Huembes) y sus 5 rutas conectadas.
                     </p>
                     <button 
                       onClick={async () => {
                         setIsSettingsOpen(false);
-                        setNotification({ message: 'Sembrando datos...', type: 'success' });
+                        setNotification({ message: 'Limpiando y re-sembrando los 5 puntos...', type: 'success' });
                         try {
+                          await clearDatabase();
                           await seedDatabase();
-                          setNotification({ message: '¡Datos cargados con éxito!', type: 'success' });
+                          setNotification({ message: '¡5 Puntos de Conexión cargados con éxito!', type: 'success' });
                         } catch (err) {
-                          setNotification({ message: 'Error al sembrar datos', type: 'error' });
+                          setNotification({ message: 'Error al sembrar 5 puntos de conexión', type: 'error' });
                         }
                         setTimeout(() => setNotification(null), 3000);
                       }}
                       className="w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-all rounded-xl text-[10px] font-bold uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2 shadow-sm"
                     >
                       <Activity size={14} />
-                      Sembrar Datos de Prueba
+                      Crear 5 Puntos de Conexión y Rutas
                     </button>
                   </div>
 
