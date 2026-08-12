@@ -134,6 +134,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
   const [selectedPostCategory, setSelectedPostCategory] = useState<string>('Todos');
   const [selectedTouristPost, setSelectedTouristPost] = useState<TouristPost | null>(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [touristOriginModalPost, setTouristOriginModalPost] = useState<TouristPost | null>(null);
 
   const handleGetGPSLocation = () => {
     if (!navigator.geolocation) {
@@ -432,13 +433,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
   };
 
   const handleNavigateToTouristPost = (post: TouristPost) => {
-    const destName = post.destinationStopName || post.title;
-    setDestText(destName);
-    setSelectedTouristPost(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-      handleSearch(destName);
-    }, 150);
+    setTouristOriginModalPost(post);
   };
 
   return (
@@ -1286,6 +1281,116 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                   <Navigation size={18} />
                   <span>📍 ¿CÓMO LLEGAR? (CALCULAR RUTA & BAHÍAS)</span>
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal de Elección de Origen para Publicaciones Turísticas */}
+      <AnimatePresence>
+        {touristOriginModalPost && (
+          <div className="fixed inset-0 z-[12000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-[2.5rem] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-zinc-100 relative text-left font-sans space-y-6"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <span className="px-2.5 py-1 bg-blue-50 text-nic-blue text-[9px] font-black uppercase tracking-wider rounded-full border border-blue-100">
+                    📍 Planificar Ruta a Sitio Turístico
+                  </span>
+                  <h3 className="text-lg font-black text-zinc-950 leading-tight">
+                    ¿Desde dónde saldrás para ir a {touristOriginModalPost.title}?
+                  </h3>
+                  <p className="text-xs text-zinc-500 font-medium">
+                    Destino: <strong className="text-zinc-900">{touristOriginModalPost.destinationStopName || touristOriginModalPost.title}</strong>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setTouristOriginModalPost(null)}
+                  className="w-9 h-9 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 rounded-full flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Opción 1: Ubicación GPS actual */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const destName = touristOriginModalPost.destinationStopName || touristOriginModalPost.title;
+                    setDestText(destName);
+                    setSelectedTouristPost(null);
+                    setTouristOriginModalPost(null);
+                    handleGetGPSLocation();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => {
+                      handleSearch(destName);
+                    }, 300);
+                  }}
+                  className="w-full p-4 bg-gradient-to-r from-blue-50 to-sky-50 hover:from-blue-100 hover:to-sky-100 border border-blue-200/80 rounded-2xl flex items-center gap-4 text-left transition-all group cursor-pointer shadow-xs active:scale-[0.98]"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-nic-blue text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition-transform">
+                    <Navigation size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-xs font-black text-zinc-950 uppercase tracking-wider">📍 Desde mi ubicación actual (GPS)</h4>
+                    <p className="text-[11px] text-zinc-600 font-medium mt-0.5">Utiliza tu señal GPS para calcular la parada y las rutas más cercanas.</p>
+                  </div>
+                  <ChevronRight size={18} className="text-nic-blue group-hover:translate-x-1 transition-transform shrink-0" />
+                </button>
+
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-zinc-200"></div>
+                  <span className="flex-shrink mx-3 text-[10px] font-black uppercase text-zinc-400 tracking-wider">O selecciona una parada general</span>
+                  <div className="flex-grow border-t border-zinc-200"></div>
+                </div>
+
+                {/* Opción 2: Parada o Bahía general */}
+                <div className="space-y-2">
+                  <p className="text-[11px] font-black uppercase tracking-wider text-zinc-500">🏣 Selecciona una bahía o parada de partida:</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
+                    {[
+                      "UCA / Universidad Centroamericana",
+                      "Metrocentro",
+                      "Plaza Inter / Catedral",
+                      "Mercado Roberto Huembes",
+                      "Mercado Oriental",
+                      "Rotonda Bello Horizonte",
+                      "Linda Vista",
+                      "Multicentro Las Américas",
+                      "Galerías Santo Domingo",
+                      "UNAN Managua",
+                      "Terminal Israel Lewites",
+                      "Rotonda Jean Paul Genie"
+                    ].map((stopName, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          const destName = touristOriginModalPost.destinationStopName || touristOriginModalPost.title;
+                          setOriginText(stopName);
+                          setDestText(destName);
+                          setSelectedTouristPost(null);
+                          setTouristOriginModalPost(null);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          setTimeout(() => {
+                            handleSearch(destName);
+                          }, 200);
+                        }}
+                        className="p-3 bg-zinc-50 hover:bg-zinc-100 hover:border-nic-blue/40 border border-zinc-200/80 rounded-xl text-left text-xs font-extrabold text-zinc-800 transition-all flex items-center justify-between cursor-pointer group"
+                      >
+                        <span className="truncate">{stopName}</span>
+                        <ChevronRight size={14} className="text-zinc-300 group-hover:text-nic-blue shrink-0 ml-1" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>

@@ -25,7 +25,9 @@ import {
   Globe,
   ChevronDown,
   Menu,
-  X
+  X,
+  AlertCircle,
+  User as UserIcon
 } from 'lucide-react';
 import { Route, Stop, RouteOption, Driver, Schedule, isBoatRoute } from './types';
 import { RouteService } from './services/routeService';
@@ -288,6 +290,7 @@ export default function App() {
   const handleRouteSelect = (route: RouteOption) => {
     setSelectedRoute(route);
     setMobileMapTab('map');
+    setActiveTab('map');
     setShowNavChoice(true);
   };
 
@@ -980,6 +983,62 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[12000] bg-white/95 backdrop-blur-md border-t border-zinc-200/90 px-2 py-2.5 flex items-center justify-around shadow-2xl">
+        <button
+          type="button"
+          onClick={() => setActiveTab('search')}
+          className={cn(
+            "flex flex-col items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer",
+            activeTab === 'search' ? "text-nic-blue" : "text-zinc-400 hover:text-zinc-600"
+          )}
+        >
+          <Search size={20} />
+          <span>Buscar</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('map')}
+          className={cn(
+            "flex flex-col items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors relative cursor-pointer",
+            activeTab === 'map' ? "text-nic-blue" : "text-zinc-400 hover:text-zinc-600"
+          )}
+        >
+          <div className="relative">
+            <MapPin size={20} />
+            {selectedRoute && (
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse border-2 border-white" />
+            )}
+          </div>
+          <span>Mapa</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('reports')}
+          className={cn(
+            "flex flex-col items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer",
+            activeTab === 'reports' ? "text-nic-blue" : "text-zinc-400 hover:text-zinc-600"
+          )}
+        >
+          <AlertCircle size={20} />
+          <span>Reportar</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('profile')}
+          className={cn(
+            "flex flex-col items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer",
+            activeTab === 'profile' ? "text-nic-blue" : "text-zinc-400 hover:text-zinc-600"
+          )}
+        >
+          <UserIcon size={20} />
+          <span>Perfil</span>
+        </button>
+      </nav>
 
       {/* Luxury arrival notification toast */}
       <AnimatePresence>
