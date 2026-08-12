@@ -335,97 +335,130 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
 
   // 3. Leaflet Map setup on load
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    const container = mapContainerRef.current;
+    if (!container) return;
 
-    // Initialize map with explicit dragging and touch interaction options
-    const customCanvasRenderer = L.canvas({ padding: 0.5 });
-
-    const map = L.map(mapContainerRef.current, {
-      zoomControl: false,
-      attributionControl: false,
-      dragging: true,
-      touchZoom: true,
-      scrollWheelZoom: true,
-      doubleClickZoom: true,
-      boxZoom: true,
-      tap: false, // Prevent click/drag lag or block on touch screen devices
-      rotate: true, // Enable live rotation support
-      bearing: 0,
-      rotateControl: false, // Only show our premium custom UI
-      touchRotate: true, // Enable direct two-finger pinch gesture to rotate map naturally!
-      zoomAnimation: true,
-      fadeAnimation: true,
-      markerZoomAnimation: true,
-      zoomSnap: 0, // Continuous fluid zoom matching Google Maps behavior
-      zoomDelta: 0.25,
-      renderer: customCanvasRenderer
-    } as any).setView([12.1364, -86.2514], 13); // Managua center
-
-    // Explicitly guarantee dragging is enabled
-    if (map.dragging && !map.dragging.enabled()) {
-      map.dragging.enable();
+    // Remove any existing map instance and clear Leaflet internal ID to avoid "Map container is already initialized" crash
+    if (mapRef.current) {
+      try {
+        mapRef.current.off();
+        mapRef.current.remove();
+      } catch (err) {
+        console.warn("Previous map cleanup warning:", err);
+      }
+      mapRef.current = null;
     }
 
-    // Premium light map layers (CartoDB Positron)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-    }).addTo(map);
-
-    // Zoom buttons styling in bottom right
-    L.control.zoom({
-      position: 'bottomright'
-    }).addTo(map);
-
-    // Minimal elegant attribution in bottom left
-    L.control.attribution({
-      position: 'bottomleft',
-      prefix: false
-    }).addTo(map);
-
-    mapRef.current = map;
-
-    // Create groups
-    const stopMarkersGroup = L.featureGroup().addTo(map);
-    const routePolylineGroup = L.featureGroup().addTo(map);
-    const locationMarkersGroup = L.featureGroup().addTo(map);
-    const busMarkersGroup = L.featureGroup().addTo(map);
-
-    stopMarkersGroupRef.current = stopMarkersGroup;
-    routePolylineGroupRef.current = routePolylineGroup;
-    locationMarkersGroupRef.current = locationMarkersGroup;
-    busMarkersGroupRef.current = busMarkersGroup;
-
-    // Track active zoom changes to keep HUD synced without unnecessary high-frequency re-renders during drag
-    setZoomLevel(map.getZoom());
-
-    map.on('zoomend', () => {
-      setZoomLevel(map.getZoom());
-    });
-
-    map.on('rotate' as any, () => {
-      setRotation((map as any).getBearing() || 0);
-    });
-
-    map.on('click', (e: any) => {
-      if (isSimulationModeRef.current) {
-        const { lat, lng } = e.latlng;
-        setUserLocation({ lat, lng });
+    if ((container as any)._leaflet_id) {
+      try {
+        delete (container as any)._leaflet_id;
+      } catch (err) {
+        (container as any)._leaflet_id = undefined;
       }
-    });
+    }
+
+    let map: L.Map | null = null;
+    try {
+      // Initialize map with explicit dragging and touch interaction options
+      const customCanvasRenderer = L.canvas({ padding: 0.5 });
+
+      map = L.map(container, {
+        zoomControl: false,
+        attributionControl: false,
+        dragging: true,
+        touchZoom: true,
+        scrollWheelZoom: true,
+        doubleClickZoom: true,
+        boxZoom: true,
+        tap: false, // Prevent click/drag lag or block on touch screen devices
+        rotate: true, // Enable live rotation support
+        bearing: 0,
+        rotateControl: false, // Only show our premium custom UI
+        touchRotate: true, // Enable direct two-finger pinch gesture to rotate map naturally!
+        zoomAnimation: true,
+        fadeAnimation: true,
+        markerZoomAnimation: true,
+        zoomSnap: 0, // Continuous fluid zoom matching Google Maps behavior
+        zoomDelta: 0.25,
+        renderer: customCanvasRenderer
+      } as any).setView([12.1364, -86.2514], 13); // Managua center
+
+      // Explicitly guarantee dragging is enabled
+      if (map.dragging && !map.dragging.enabled()) {
+        map.dragging.enable();
+      }
+
+      // Premium light map layers (CartoDB Positron)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      }).addTo(map);
+
+      // Zoom buttons styling in bottom right
+      L.control.zoom({
+        position: 'bottomright'
+      }).addTo(map);
+
+      // Minimal elegant attribution in bottom left
+      L.control.attribution({
+        position: 'bottomleft',
+        prefix: false
+      }).addTo(map);
+
+      mapRef.current = map;
+
+      // Create groups
+      const stopMarkersGroup = L.featureGroup().addTo(map);
+      const routePolylineGroup = L.featureGroup().addTo(map);
+      const locationMarkersGroup = L.featureGroup().addTo(map);
+      const busMarkersGroup = L.featureGroup().addTo(map);
+
+      stopMarkersGroupRef.current = stopMarkersGroup;
+      routePolylineGroupRef.current = routePolylineGroup;
+      locationMarkersGroupRef.current = locationMarkersGroup;
+      busMarkersGroupRef.current = busMarkersGroup;
+
+      // Track active zoom changes to keep HUD synced without unnecessary high-frequency re-renders during drag
+      setZoomLevel(map.getZoom());
+
+      map.on('zoomend', () => {
+        if (mapRef.current) setZoomLevel(mapRef.current.getZoom());
+      });
+
+      map.on('rotate' as any, () => {
+        if (mapRef.current) {
+          try {
+            setRotation((mapRef.current as any).getBearing() || 0);
+          } catch (e) {}
+        }
+      });
+
+      map.on('click', (e: any) => {
+        if (isSimulationModeRef.current) {
+          const { lat, lng } = e.latlng;
+          setUserLocation({ lat, lng });
+        }
+      });
+    } catch (err) {
+      console.error("Error creating Leaflet map instance:", err);
+    }
 
     return () => {
       if (mapRef.current) {
-        const mapToDestroy = mapRef.current;
+        try {
+          mapRef.current.off();
+          mapRef.current.remove();
+        } catch (err) {
+          console.warn("Leaflet map cleanup ignored:", err);
+        }
         mapRef.current = null;
-        setTimeout(() => {
-          try {
-            mapToDestroy.off();
-            mapToDestroy.remove();
-          } catch (err) {
-            console.warn("Leaflet map cleanup ignored:", err);
-          }
-        }, 0);
+      }
+      if (container && (container as any)._leaflet_id) {
+        try {
+          delete (container as any)._leaflet_id;
+        } catch (err) {
+          (container as any)._leaflet_id = undefined;
+        }
       }
     };
   }, []);
