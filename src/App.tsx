@@ -519,7 +519,7 @@ export default function App() {
 
                     <div className="p-6 space-y-6 flex-1 overflow-y-auto max-h-[58vh] lg:max-h-[480px] custom-scrollbar">
                       {/* Driver Info Card */}
-                      {selectedRoute.steps.some(s => s.routeId) && (() => {
+                      {selectedRoute?.steps && selectedRoute.steps.some(s => s.routeId) && (() => {
                         const routeId = selectedRoute.steps.find(s => s.routeId)?.routeId;
                         const route = routes.find(r => r.id === routeId);
                         let driver = drivers.find(d => d.id === route?.driverId);
@@ -570,7 +570,7 @@ export default function App() {
                             <div className="flex-1 min-w-0">
                               <p className="text-[9px] font-black uppercase text-zinc-400">¿Dónde se agarra? (Abordaje)</p>
                               <p className="font-extrabold text-zinc-900 truncate">
-                                {stops.find(s => s.id === selectedRoute.steps[0]?.stopId)?.name || 'Punto de Inicio'}
+                                {stops.find(s => s.id === selectedRoute?.steps?.[0]?.stopId)?.name || 'Punto de Inicio'}
                               </p>
                             </div>
                           </div>
@@ -581,7 +581,7 @@ export default function App() {
                             <div className="flex-1 min-w-0">
                               <p className="text-[9px] font-black uppercase text-zinc-400">¿Dónde se baja? (Desembarque)</p>
                               <p className="font-extrabold text-zinc-900 truncate">
-                                {stops.find(s => s.id === selectedRoute.steps[selectedRoute.steps.length - 1]?.stopId)?.name || 'Punto de Destino'}
+                                {stops.find(s => s.id === selectedRoute?.steps?.[(selectedRoute?.steps?.length || 1) - 1]?.stopId)?.name || 'Punto de Destino'}
                               </p>
                             </div>
                           </div>
@@ -599,7 +599,7 @@ export default function App() {
                             <div className="bg-white/80 border border-zinc-150/40 p-2.5 rounded-xl">
                               <p className="text-[9px] font-black uppercase text-zinc-400">Tipo de Viaje</p>
                               <p className="text-xs font-black text-zinc-950 mt-1 leading-none">
-                                {selectedRoute.steps.some(s => s.type === 'transfer') ? (
+                                {selectedRoute?.steps?.some(s => s.type === 'transfer') ? (
                                   <span className="text-indigo-600 block">Con Transbordo</span>
                                 ) : (
                                   <span className="text-emerald-600 block">Directo</span>
@@ -650,7 +650,7 @@ export default function App() {
                           </div>
 
                           <div className="space-y-3">
-                            {selectedRoute.steps.map((step, idx) => {
+                            {(selectedRoute?.steps || []).map((step, idx) => {
                               const stop = stops.find(s => s.id === step.stopId);
                               const schedule = schedules.find(s => s.routeId === step.routeId && s.stopId === step.stopId);
                               return (
@@ -699,12 +699,13 @@ export default function App() {
                           </div>
 
                           <div className="space-y-6">
-                            {selectedRoute.steps.map((step, idx) => {
+                            {(selectedRoute?.steps || []).map((step, idx) => {
                               const stop = stops.find(s => s.id === step.stopId);
                               const schedule = schedules.find(s => s.routeId === step.routeId && s.stopId === step.stopId);
+                              const totalStepsLength = selectedRoute?.steps?.length || 0;
                               return (
                                 <div key={idx} className="flex gap-4 relative">
-                                  {idx !== selectedRoute.steps.length - 1 && (
+                                  {idx !== totalStepsLength - 1 && (
                                     <div className="absolute left-[11px] top-6 bottom-0 w-0.5 bg-zinc-100" />
                                   )}
                                   <div className={cn(
@@ -816,14 +817,14 @@ export default function App() {
                     <div className="space-y-1">
                       <p className="font-bold text-[9px] text-zinc-400 uppercase tracking-wider leading-none">🛫 ¿Dónde se agarra? (Abordaje)</p>
                       <p className="font-extrabold text-zinc-900">
-                        {stops.find(s => s.id === selectedRoute.steps[0]?.stopId)?.name || 'Punto de Inicio'}
+                        {stops.find(s => s.id === selectedRoute?.steps?.[0]?.stopId)?.name || 'Punto de Inicio'}
                       </p>
                     </div>
                     
                     <div className="space-y-1">
                       <p className="font-bold text-[9px] text-zinc-400 uppercase tracking-wider leading-none">🛬 ¿Dónde se baja? (Desembarque)</p>
                       <p className="font-extrabold text-zinc-900">
-                        {stops.find(s => s.id === selectedRoute.steps[selectedRoute.steps.length - 1]?.stopId)?.name || 'Punto de Destino'}
+                        {stops.find(s => s.id === selectedRoute?.steps?.[(selectedRoute?.steps?.length || 1) - 1]?.stopId)?.name || 'Punto de Destino'}
                       </p>
                     </div>
 
@@ -837,7 +838,7 @@ export default function App() {
                     <div className="space-y-1 bg-white p-2.5 rounded-xl border border-zinc-150/50 shadow-sm">
                       <p className="font-bold text-[9px] text-zinc-400 uppercase tracking-wider leading-none">⚡ Modalidad</p>
                       <p className="font-black text-emerald-600">
-                        {selectedRoute.steps.some(s => s.type === 'transfer') ? 'Con Transbordo' : 'Directo (Sin Escalas)'}
+                        {selectedRoute?.steps?.some(s => s.type === 'transfer') ? 'Con Transbordo' : 'Directo (Sin Escalas)'}
                       </p>
                     </div>
                   </div>
