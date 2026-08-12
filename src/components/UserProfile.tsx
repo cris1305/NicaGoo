@@ -2,12 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { auth } from '../firebase';
 import { signInWithPopup, GoogleAuthProvider, signOut, User } from 'firebase/auth';
-import { LogOut, LogIn, User as UserIcon, Shield, Heart, History, AlertCircle, ChevronRight, MessageSquare, Camera, CheckCircle, Save, Eye, X, ArrowLeft } from 'lucide-react';
+import { LogOut, LogIn, User as UserIcon, Shield, Heart, History, AlertCircle, ChevronRight, MessageSquare, Camera, CheckCircle, Save, Eye, X, ArrowLeft, Sparkles, Zap } from 'lucide-react';
 import { collection, query, where, onSnapshot, orderBy, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Favorite, HistoryItem, Report } from '../types';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../lib/LanguageContext';
+
+// @ts-ignore
+import guardabarrancoImg from '../assets/images/guardabarranco_avatar_1786551890533.jpg';
+// @ts-ignore
+import tigreImg from '../assets/images/tigre_avatar_1786551902842.jpg';
+// @ts-ignore
+import tiburonImg from '../assets/images/tiburon_avatar_1786551914968.jpg';
+
+const NICARAGUA_FAUNA_AVATARS = [
+  {
+    id: 'guardabarranco',
+    name: 'Guardabarranco',
+    url: guardabarrancoImg,
+    greeting: '¡Hola! 👋 ¡Soy el Guardabarranco! ¡Listo para volar en las rutas de NicaGo!',
+    badge: 'Ave Nacional'
+  },
+  {
+    id: 'tigre',
+    name: 'Tigre',
+    url: tigreImg,
+    greeting: '¡Hola! 👋 ¡Soy el Tigre! ¡Con toda la fuerza y rapidez para tu trayecto!',
+    badge: 'Fuerza Nica'
+  },
+  {
+    id: 'tiburon-agua-dulce',
+    name: 'Tiburón de agua dulce',
+    url: tiburonImg,
+    greeting: '¡Hola! 👋 ¡Soy el Tiburón de agua dulce del Lago Cocibolca!',
+    badge: 'Lago Cocibolca'
+  }
+];
 
 const createGuardabarrancoSVG = () => `data:image/svg+xml;utf8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
@@ -532,80 +563,7 @@ const createCaptainConductorSVG = () => `data:image/svg+xml;utf8,${encodeURIComp
 </svg>
 `)}`;
 
-const NICARAGUA_FAUNA_AVATARS = [
-  {
-    id: 'nicabot-cyber',
-    name: 'NicaBot AI Cyber 3D',
-    tag: 'Asistente IA NicaGo',
-    url: createNicaBotCyberSVG()
-  },
-  {
-    id: 'conductor-captain',
-    name: 'Capitán NicaGo 3D',
-    tag: 'Conductor Pro',
-    url: createCaptainConductorSVG()
-  },
-  {
-    id: 'guardabarranco',
-    name: 'Guardabarranco 3D',
-    tag: 'Ave Nacional Nica',
-    url: createGuardabarrancoSVG()
-  },
-  {
-    id: 'jaguarete',
-    name: 'Jaguar 3D',
-    tag: 'Bosawás & Indio Maíz',
-    url: createJaguarSVG()
-  },
-  {
-    id: 'monito-congo',
-    name: 'Mono Congo 3D',
-    tag: 'Reserva Mombacho',
-    url: createMonoCongoSVG()
-  },
-  {
-    id: 'tortuga-paslama',
-    name: 'Tortuga Paslama 3D',
-    tag: 'Refugio La Flor',
-    url: createTortugaSVG()
-  },
-  {
-    id: 'chocoyo-verde',
-    name: 'Chocoyo Zapoyol 3D',
-    tag: 'El Chocoyero',
-    url: createChocoyoSVG()
-  },
-  {
-    id: 'danto-tapir',
-    name: 'Danto / Tapir 3D',
-    tag: 'Selva Indio Maíz',
-    url: createDantoTapirSVG()
-  },
-  {
-    id: 'rana-ojos-rojos',
-    name: 'Rana Ojos Rojos 3D',
-    tag: 'Selva Negra & Matagalpa',
-    url: createRanaOjosRojosSVG()
-  },
-  {
-    id: 'tiburon-lago',
-    name: 'Tiburón Toro 3D',
-    tag: 'Lago Cocibolca',
-    url: createTiburonToroSVG()
-  },
-  {
-    id: 'bus-express',
-    name: 'NicaGo Express 3D',
-    tag: 'Transporte Urbano',
-    url: createBus3DSVG()
-  },
-  {
-    id: 'pasajero-pro',
-    name: 'Viajero Pro 3D',
-    tag: 'Pasajero Inteligente',
-    url: createPassenger3DSVG()
-  }
-];
+// Avatars array initialized above with the 3 requested avatars: Guardabarranco, Tigre, Tiburón.
 
 interface UserProfileProps {
   onLogout?: () => void;
@@ -622,11 +580,13 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
   const [isViewingAvatar, setIsViewingAvatar] = useState(false);
   const [isWaving, setIsWaving] = useState(false);
   const [showGreetingBubble, setShowGreetingBubble] = useState(false);
+  const [customGreetingText, setCustomGreetingText] = useState<string | null>(null);
+  const [activeWavingAvatarId, setActiveWavingAvatarId] = useState<string | null>(null);
 
   useEffect(() => {
     setIsWaving(true);
     setShowGreetingBubble(true);
-    const waveTimeout = setTimeout(() => setIsWaving(false), 2000);
+    const waveTimeout = setTimeout(() => setIsWaving(false), 2200);
     const bubbleTimeout = setTimeout(() => setShowGreetingBubble(false), 6000);
     return () => {
       clearTimeout(waveTimeout);
@@ -635,9 +595,32 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
   }, []);
 
   const triggerGreeting = () => {
+    const currentAvatarObj = NICARAGUA_FAUNA_AVATARS.find(a => a.url === editPhoto);
+    if (currentAvatarObj) {
+      setCustomGreetingText(currentAvatarObj.greeting);
+      setActiveWavingAvatarId(currentAvatarObj.id);
+    } else {
+      setCustomGreetingText(`¡Hola, ${user?.displayName?.split(' ')[0] || 'Pasajero'}! 👋 ¡Bienvenido a NicaGo!`);
+    }
     setIsWaving(true);
     setShowGreetingBubble(true);
-    setTimeout(() => setIsWaving(false), 2000);
+    setTimeout(() => {
+      setIsWaving(false);
+      setActiveWavingAvatarId(null);
+    }, 2200);
+  };
+
+  const triggerAvatarGreeting = (avatar: typeof NICARAGUA_FAUNA_AVATARS[0]) => {
+    setEditPhoto(avatar.url);
+    setActiveWavingAvatarId(avatar.id);
+    setCustomGreetingText(avatar.greeting);
+    setIsWaving(true);
+    setShowGreetingBubble(true);
+
+    setTimeout(() => {
+      setIsWaving(false);
+      setActiveWavingAvatarId(null);
+    }, 2200);
   };
 
   const getReportStatusDetails = (status: string) => {
@@ -995,82 +978,107 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                       onClick={() => setShowGreetingBubble(false)}
                       whileHover={{ scale: 1.06 }}
                       whileTap={{ scale: 0.94 }}
-                      className="absolute top-1 left-1/2 -translate-x-1/2 bg-gradient-to-r from-nic-blue via-sky-500 to-indigo-600 text-white text-[12px] font-extrabold px-4 py-2 rounded-full shadow-xl shadow-blue-500/25 border border-white/30 flex items-center gap-2 cursor-pointer select-none active:scale-95 transition-all z-30 whitespace-nowrap"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 bg-gradient-to-r from-nic-blue via-sky-500 to-indigo-600 text-white text-[11px] font-extrabold px-4 py-2.5 rounded-2xl shadow-xl shadow-blue-500/25 border border-white/30 flex items-center gap-2 cursor-pointer select-none active:scale-95 transition-all z-30 whitespace-normal max-w-[280px] sm:max-w-xs text-center"
                     >
-                      <span className="tracking-tight">
-                        {language === 'es' ? '¡Hola' : language === 'zh' ? '你好' : 'Hello'}, {user.displayName?.split(' ')[0] || 'Pasajero'}!
-                      </span>
                       <motion.span
-                        className="inline-block origin-[70%_70%] text-sm"
-                        animate={{ rotate: [0, 20, -12, 20, -12, 20, 0] }}
+                        className="inline-block origin-[70%_70%] text-base shrink-0"
+                        animate={{ rotate: [0, 22, -14, 22, -14, 20, 0] }}
                         transition={{
                           duration: 1.2,
                           repeat: Infinity,
-                          repeatDelay: 1.2,
+                          repeatDelay: 0.5,
                           ease: "easeInOut"
                         }}
                       >
                         👋
                       </motion.span>
+                      <span className="tracking-tight leading-tight">
+                        {customGreetingText || `${language === 'es' ? '¡Hola' : language === 'zh' ? '你好' : 'Hello'}, ${user.displayName?.split(' ')[0] || 'Pasajero'}!`}
+                      </span>
                       {/* Speech Bubble Arrow pointing down to avatar */}
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-indigo-600 rotate-45 border-r border-b border-white/20" />
+                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-indigo-600 rotate-45 border-r border-b border-white/20" />
                     </motion.div>
                   )}
                 </AnimatePresence>
 
                 <motion.div
                   animate={isWaving ? {
-                    scaleX: [1, 1.16, 0.82, 1.12, 0.94, 1.03, 1],
-                    scaleY: [1, 0.82, 1.18, 0.88, 1.06, 0.97, 1],
+                    scaleX: [1, 1.18, 0.84, 1.14, 0.94, 1.04, 1],
+                    scaleY: [1, 0.84, 1.18, 0.88, 1.06, 0.97, 1],
                     y: [0, 6, -14, 3, -1, 0, 0],
                     rotate: [0, -12, 12, -12, 12, -6, 6, 0]
                   } : {
-                    scaleY: [1, 1.03, 1],
-                    y: [0, -2, 0]
+                    scaleY: [1, 1.04, 1],
+                    y: [0, -4, 0]
                   }}
                   transition={isWaving ? {
-                    duration: 1.25,
+                    duration: 1.3,
                     ease: "easeInOut"
                   } : {
-                    duration: 4,
+                    duration: 3.5,
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
                   onClick={triggerGreeting}
-                  className="cursor-pointer"
+                  className="cursor-pointer relative"
                 >
                   <button 
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsViewingAvatar(true);
+                      triggerGreeting();
                     }}
-                    className="w-24 h-24 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-nic-blue/40 ring-4 ring-blue-500/15 hover:ring-nic-blue/40 transition-all cursor-pointer relative shadow-xl block animate-fadeIn p-1 group"
-                    title={language === 'es' ? 'Ver avatar / saludar' : 'View avatar / wave'}
+                    className="w-28 h-28 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-nic-blue/50 ring-4 ring-blue-500/20 hover:ring-nic-blue/50 transition-all cursor-pointer relative shadow-xl block p-1 group"
+                    title={language === 'es' ? '¡Haz click para que te salude!' : 'Click to greet!'}
                   >
                     <div className="w-full h-full rounded-full overflow-hidden bg-zinc-50 relative flex items-center justify-center">
                       {editPhoto || user.photoURL ? (
-                        <img src={editPhoto || user.photoURL} alt={editName || user.displayName || ''} referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-full" />
+                        <img src={editPhoto || user.photoURL} alt={editName || user.displayName || ''} referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300" />
                       ) : (
-                        <UserIcon size={36} className="text-nic-blue" />
+                        <UserIcon size={40} className="text-nic-blue" />
                       )}
                       {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-zinc-950/45 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity duration-200 rounded-full">
-                        <Eye size={20} className="text-white scale-90 group-hover:scale-100 transition-transform duration-200" />
-                        <span className="text-[7px] font-black uppercase tracking-widest mt-0.5 text-white">
-                          {language === 'es' ? 'Ver' : 'View'}
+                      <div className="absolute inset-0 bg-nic-blue/40 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity duration-200 rounded-full">
+                        <motion.span 
+                          className="text-2xl"
+                          animate={{ rotate: [0, 20, -20, 20, 0] }}
+                          transition={{ duration: 0.8, repeat: Infinity }}
+                        >
+                          👋
+                        </motion.span>
+                        <span className="text-[8px] font-black uppercase tracking-wider mt-0.5 text-white">
+                          {language === 'es' ? '¡Saludar!' : 'Greet!'}
                         </span>
                       </div>
                     </div>
                   </button>
+
+                  {/* Pulsing Greeting Ripple Ring */}
+                  {isWaving && (
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0.8 }}
+                      animate={{ scale: 1.5, opacity: 0 }}
+                      transition={{ duration: 1, repeat: 2 }}
+                      className="absolute inset-0 rounded-full border-2 border-nic-blue pointer-events-none"
+                    />
+                  )}
                 </motion.div>
               </div>
               
               <h3 className="font-extrabold text-zinc-900 text-lg mt-4 leading-tight">{user.displayName || 'Usuario'}</h3>
               <p className="text-xs font-semibold text-zinc-400 mt-1 truncate max-w-full">{user.email}</p>
               
-              <div className="mt-4 px-3 py-1 bg-zinc-100 rounded-full text-[9px] font-black text-zinc-500 uppercase tracking-wider">
-                {user.email === 'admin@nicago.com' ? 'Administrador' : 'Pasajero'}
+              <div className={cn(
+                "mt-4 px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider inline-block border",
+                (localStorage.getItem('localAuth') === 'superadmin') ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                (localStorage.getItem('localAuth') === 'admin') ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
+                (localStorage.getItem('localAuth') === 'driver') ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
+                "bg-blue-500/10 text-blue-600 border-blue-500/20"
+              )}>
+                {localStorage.getItem('localAuth') === 'superadmin' ? 'Superadministrador' :
+                 localStorage.getItem('localAuth') === 'admin' ? 'Administrador' :
+                 localStorage.getItem('localAuth') === 'driver' ? 'Chofer de Ruta' :
+                 'Pasajero'}
               </div>
             </div>
 
@@ -1307,59 +1315,117 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                   </p>
                 </div>
 
-                {/* Avatar Presets Selection */}
-                <div className="space-y-3 p-4 bg-zinc-50/80 rounded-2xl border border-zinc-200/80 text-left">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
+                {/* Avatar Presets Selection - 3 Avatars */}
+                <div className="space-y-4 p-5 bg-white rounded-3xl border border-zinc-200 text-left text-zinc-900 shadow-sm relative overflow-hidden">
+                  <div className="flex items-center justify-between flex-wrap gap-2 relative z-10">
                     <div>
-                      <span className="text-xs font-black uppercase tracking-wider text-zinc-900 flex items-center gap-1.5">
-                        🇳🇮 Avatares Animados de Fauna Nicaragüense
+                      <span className="text-xs font-black uppercase tracking-wider text-nic-blue flex items-center gap-1.5">
+                        <Zap size={14} className="text-nic-blue fill-nic-blue/20" />
+                        <span>Selecciona tu Avatar</span>
                       </span>
-                      <p className="text-[10px] text-zinc-500 font-medium">
-                        Animaciones vectoriales de alta velocidad compatibles con el plan gratis de Firebase
+                      <p className="text-[11px] text-zinc-500 font-medium mt-0.5">
+                        Elige tu avatar preferido para tu perfil
                       </p>
                     </div>
-                    <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase tracking-wider rounded-full border border-emerald-200/60 shadow-xs flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                      ✨ 100% Animados
+                    <span className="px-3 py-1 bg-blue-50 text-nic-blue text-[10px] font-black uppercase tracking-wider rounded-full border border-blue-100 shadow-xs flex items-center gap-1.5">
+                      ✨ 3 Avatares
                     </span>
                   </div>
 
-                  {/* Grid of Nicaraguan Animals */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
-                    {NICARAGUA_FAUNA_AVATARS.map((animal) => {
+                  {/* Grid of 3 Custom Avatars with Motion and Greetings */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1 relative z-10">
+                    {NICARAGUA_FAUNA_AVATARS.map((animal, idx) => {
                       const isSelected = editPhoto === animal.url;
+                      const isThisWaving = activeWavingAvatarId === animal.id;
                       return (
                         <motion.button
                           key={animal.id}
                           type="button"
-                          onClick={() => setEditPhoto(animal.url)}
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
+                          onClick={() => triggerAvatarGreeting(animal)}
+                          animate={isThisWaving ? {
+                            scale: [1, 1.15, 0.92, 1.08, 0.98, 1],
+                            rotate: [0, -8, 8, -6, 6, 0],
+                            y: [0, -10, 2, -4, 0]
+                          } : {
+                            y: [0, -4, 0],
+                            rotate: [0, 1, 0, -1, 0]
+                          }}
+                          transition={isThisWaving ? {
+                            duration: 1.2,
+                            ease: "easeInOut"
+                          } : {
+                            duration: 3.5 + idx * 0.5,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: idx * 0.3
+                          }}
+                          whileHover={{ scale: 1.06, y: -6 }}
+                          whileTap={{ scale: 0.94 }}
                           className={cn(
-                            "p-2 rounded-xl border flex items-center gap-2.5 transition-all cursor-pointer text-left relative overflow-hidden bg-white shadow-xs group",
+                            "p-4 rounded-2xl border flex flex-col items-center text-center transition-all cursor-pointer relative overflow-hidden group shadow-xs",
                             isSelected
-                              ? "border-nic-blue ring-2 ring-nic-blue/20 bg-blue-50/40 shadow-xs"
-                              : "border-zinc-200/90 hover:border-zinc-300 hover:bg-zinc-50/80"
+                              ? "bg-gradient-to-b from-blue-50/90 via-sky-50/40 to-white border-nic-blue ring-2 ring-nic-blue/40 shadow-md"
+                              : "bg-zinc-50/80 border-zinc-200/90 hover:border-nic-blue/50 hover:bg-white hover:shadow-md"
                           )}
                         >
-                          <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 bg-zinc-900/5 relative p-0.5 border border-zinc-200/80 shadow-xs">
-                            <img src={animal.url} alt={animal.name} className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                          {/* Waving Hand Badge floating on top right */}
+                          <div className="absolute top-2.5 right-2.5 z-20">
+                            <motion.div
+                              whileHover={{ scale: 1.25, rotate: 15 }}
+                              className={cn(
+                                "w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-xs border transition-colors",
+                                isSelected 
+                                  ? "bg-nic-blue text-white border-blue-400" 
+                                  : "bg-white text-zinc-600 border-zinc-200 group-hover:bg-blue-50 group-hover:text-nic-blue"
+                              )}
+                              title="¡Haz click para que te salude!"
+                            >
+                              <motion.span
+                                animate={{ rotate: isSelected || isThisWaving ? [0, 22, -16, 22, 0] : 0 }}
+                                transition={{ duration: 0.8, repeat: isSelected || isThisWaving ? Infinity : 0 }}
+                              >
+                                👋
+                              </motion.span>
+                            </motion.div>
+                          </div>
+
+                          {/* Active Avatar Badge Pill */}
+                          {isSelected && (
+                            <div className="absolute top-2.5 left-2.5 z-20">
+                              <span className="px-2 py-0.5 bg-nic-blue text-white text-[8px] font-black uppercase tracking-wider rounded-full shadow-xs flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                                Activo
+                              </span>
+                            </div>
+                          )}
+
+                          <div className={cn(
+                            "w-28 h-28 rounded-2xl overflow-hidden shrink-0 relative p-1 border-2 transition-all shadow-md mb-3 bg-zinc-900/5",
+                            isSelected 
+                              ? "border-nic-blue ring-4 ring-blue-500/20 scale-105" 
+                              : "border-zinc-200 group-hover:border-nic-blue/50"
+                          )}>
+                            <img 
+                              src={animal.url} 
+                              alt={animal.name} 
+                              className="w-full h-full object-cover rounded-xl group-hover:scale-110 transition-transform duration-300" 
+                              referrerPolicy="no-referrer" 
+                            />
                             {isSelected && (
-                              <div className="absolute inset-0 bg-nic-blue/15 backdrop-blur-[0.5px] flex items-center justify-center">
-                                <CheckCircle size={16} className="text-white fill-nic-blue shadow-xs" />
+                              <div className="absolute inset-0 bg-nic-blue/15 backdrop-blur-[0.5px] flex items-center justify-center rounded-xl">
+                                <CheckCircle size={24} className="text-white fill-nic-blue shadow-md" />
                               </div>
                             )}
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1">
-                              <p className="text-[11px] font-extrabold text-zinc-950 truncate leading-snug">{animal.name}</p>
-                            </div>
-                            <p className="text-[9px] font-bold text-zinc-500 truncate mt-0.5 flex items-center gap-1">
-                              <span>{animal.tag}</span>
+
+                          <div className="w-full text-center space-y-1">
+                            <h5 className="text-xs font-black text-zinc-900 group-hover:text-nic-blue transition-colors leading-tight">
+                              {animal.name}
+                            </h5>
+                            <p className="text-[10px] text-zinc-500 font-semibold flex items-center justify-center gap-1">
+                              <Sparkles size={11} className="text-amber-500 fill-amber-400" />
+                              <span>¡Toca para saludar! 👋</span>
                             </p>
-                            <span className="inline-block mt-0.5 text-[8px] font-black uppercase text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
-                              Animado
-                            </span>
                           </div>
                         </motion.button>
                       );
@@ -1367,26 +1433,26 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                   </div>
 
                   {/* Upload custom gallery photo button */}
-                  <div className="pt-2 border-t border-zinc-200/60 flex items-center justify-between gap-3">
+                  <div className="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3 relative z-10">
                     <div className="flex items-center gap-3">
                       <label 
                         htmlFor="avatar-upload-file"
-                        className="px-5 py-2.5 bg-white hover:bg-zinc-100 border border-zinc-300 hover:border-zinc-600 rounded-full text-xs font-bold text-zinc-800 transition-all cursor-pointer flex items-center gap-2 shadow-xs active:scale-95"
+                        className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-800 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
                       >
-                        <Camera size={15} className="text-zinc-700" />
+                        <Camera size={14} className="text-nic-blue" />
                         <span>Subir Foto Personal</span>
                       </label>
 
                       {editPhoto && !NICARAGUA_FAUNA_AVATARS.some(a => a.url === editPhoto) && (
-                        <div className="flex items-center gap-2 px-3.5 py-1 bg-zinc-100 border border-zinc-250 rounded-full">
-                          <img src={editPhoto} alt="Personal" className="w-6 h-6 rounded-full object-cover" />
-                          <span className="text-[10px] font-bold text-zinc-800">Foto Personal Seleccionada</span>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-xl">
+                          <img src={editPhoto} alt="Personal" className="w-5 h-5 rounded-full object-cover" />
+                          <span className="text-[10px] font-bold text-nic-blue">Foto Personal Seleccionada</span>
                         </div>
                       )}
                     </div>
 
                     <p className="text-[9px] text-zinc-400 font-mono text-right hidden sm:block">
-                      Guardado directo en Firestore (100% Gratis)
+                      Sincronizado en tiempo real
                     </p>
                   </div>
                 </div>
@@ -1736,7 +1802,14 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                 <X size={18} />
               </button>
 
-              <div className="w-64 h-64 md:w-80 md:h-80 rounded-3xl overflow-hidden border-2 border-zinc-100 shadow-md bg-zinc-50 flex items-center justify-center mb-5">
+              <motion.div
+                animate={isWaving ? {
+                  scale: [1, 1.1, 0.92, 1.08, 0.98, 1],
+                  rotate: [0, -10, 10, -8, 8, -4, 4, 0]
+                } : {}}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+                className="w-64 h-64 md:w-80 md:h-80 rounded-3xl overflow-hidden border-2 border-nic-blue/40 ring-4 ring-blue-500/20 shadow-2xl bg-zinc-50 flex items-center justify-center mb-5 relative group"
+              >
                 {editPhoto || user.photoURL ? (
                   <img
                     src={editPhoto || user.photoURL}
@@ -1747,17 +1820,31 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                 ) : (
                   <UserIcon size={96} className="text-zinc-300" />
                 )}
-              </div>
+              </motion.div>
 
               <h4 className="text-base font-extrabold text-zinc-900 tracking-tight leading-snug">
                 {editName || user.displayName || 'Usuario'}
               </h4>
-              <p className="text-xs text-zinc-400 mt-1 mb-2">
+              <p className="text-xs text-zinc-400 mt-1 mb-3">
                 {user.email || 'Pasajero de NicaGo'}
               </p>
-              <div className="px-3 py-1 bg-zinc-100 rounded-full text-[9px] font-black text-nic-blue uppercase tracking-wider mb-2">
-                {user.email === 'admin@nicago.com' ? 'Administrador' : 'Pasajero'}
-              </div>
+
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={() => triggerGreeting()}
+                className="px-5 py-2.5 bg-gradient-to-r from-nic-blue to-sky-500 text-white rounded-full text-xs font-black uppercase tracking-wider shadow-md shadow-blue-500/25 flex items-center gap-2 border border-white/20 active:scale-95 cursor-pointer"
+              >
+                <motion.span
+                  animate={{ rotate: isWaving ? [0, 22, -16, 22, 0] : 0 }}
+                  transition={{ duration: 0.8, repeat: isWaving ? Infinity : 0 }}
+                  className="text-base"
+                >
+                  👋
+                </motion.span>
+                <span>¡Saludar al Avatar!</span>
+              </motion.button>
             </motion.div>
           </motion.div>
         )}

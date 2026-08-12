@@ -105,13 +105,19 @@ export interface RouteOption {
   etaToBoardMinutes?: number; // Minutes until the bus arrives at the starting stop
 }
 
+export type UserRole = 'superadmin' | 'admin' | 'passenger' | 'driver';
+
 export interface AppUser {
   id: string;
   name: string;
   email: string;
   photoUrl?: string;
   phoneNumber?: string;
-  role: 'admin' | 'passenger';
+  username?: string;
+  password?: string;
+  role: UserRole;
+  assignedRouteId?: string;
+  assignedRouteCode?: string;
   createdAt: string;
 }
 

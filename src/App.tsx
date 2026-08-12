@@ -44,14 +44,16 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from './lib/firestoreErrorHandler';
 import { useLanguage } from './lib/LanguageContext';
 import UserReportModule from './components/UserReportModule';
+import { UserRole } from './types';
+import DriverControlPanel from './components/DriverControlPanel';
 
 export default function App() {
   const { language, setLanguage, t } = useLanguage();
-  const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // Persistent States (Prevents updates/refresh from resetting view back to the search page)
-  const [activeTab, setActiveTabState] = useState<'search' | 'map' | 'reports' | 'profile' | 'admin'>(() => {
+  // Persistent States
+  const [activeTab, setActiveTabState] = useState<'search' | 'map' | 'reports' | 'profile' | 'admin' | 'driver'>(() => {
     const saved = localStorage.getItem('app_activeTab');
     return (saved as any) || 'search';
   });
@@ -89,7 +91,7 @@ export default function App() {
   });
 
   // Safe wrapping setters to keep localStorage and Browser History synchronized
-  const setActiveTab = (tab: 'search' | 'map' | 'reports' | 'profile' | 'admin') => {
+  const setActiveTab = (tab: 'search' | 'map' | 'reports' | 'profile' | 'admin' | 'driver') => {
     localStorage.setItem('app_activeTab', tab);
     setActiveTabState(tab);
 
@@ -251,13 +253,14 @@ export default function App() {
   useEffect(() => {
     const unsubAuth = auth.onAuthStateChanged((user) => {
       if (user) {
-        // Todos los que inicien sesión de Google entran como pasajeros (user)
-        setUserRole('user');
+        // Google auth defaults to passenger role
+        setUserRole('passenger');
         localStorage.removeItem('localAuth');
       } else {
-        const storedRole = localStorage.getItem('localAuth');
-        if (storedRole === 'admin' || storedRole === 'user') {
-          setUserRole(storedRole as 'admin' | 'user');
+        const storedRole = localStorage.getItem('localAuth') as UserRole | null;
+        if (storedRole === 'superadmin' || storedRole === 'admin' || storedRole === 'driver' || storedRole === 'passenger' || storedRole === ('user' as any)) {
+          const mappedRole: UserRole = storedRole === ('user' as any) ? 'passenger' : storedRole;
+          setUserRole(mappedRole);
         } else {
           setUserRole(null);
         }
@@ -268,9 +271,20 @@ export default function App() {
     // Real-time feeds for system context
     const unsubRoutes = onSnapshot(collection(db, 'routes'), async (s) => {
       const docs = s.docs.map(doc => ({ id: doc.id, ...doc.data() } as Route));
-      setRoutes(docs);
-      if (s.empty) {
-        console.log("Database empty. Auto-seeding 5 connection points dataset...");
+      
+      // Deduplicate routes by code/name in memory for state safety
+      const uniqueRoutesMap = new Map<string, Route>();
+      for (const d of docs) {
+        const key = (d.code || d.name || d.id).trim().toUpperCase();
+        if (!uniqueRoutesMap.has(key)) {
+          uniqueRoutesMap.set(key, d);
+        }
+      }
+      const uniqueDocs = Array.from(uniqueRoutesMap.values());
+      setRoutes(uniqueDocs);
+
+      if (s.empty || docs.length > uniqueDocs.length) {
+        console.log("Database empty or duplicate route records detected. Cleaning and seeding database...");
         await seedDatabase();
       }
     }, (error) => handleFirestoreError(error, OperationType.GET, 'routes'));
@@ -290,9 +304,16 @@ export default function App() {
     };
   }, []);
 
-  const handleLogin = (role: 'admin' | 'user') => {
+  const handleLogin = (role: UserRole) => {
     localStorage.setItem('localAuth', role);
     setUserRole(role);
+    if (role === 'driver') {
+      setActiveTab('driver');
+    } else if (role === 'admin' || role === 'superadmin') {
+      setActiveTab('admin');
+    } else {
+      setActiveTab('search');
+    }
   };
 
   const handleRouteSelect = (route: RouteOption) => {
@@ -397,7 +418,7 @@ export default function App() {
             >
               Perfil
             </button>
-            {userRole === 'admin' && (
+            {(userRole === 'admin' || userRole === 'superadmin') && (
               <button 
                 onClick={() => setActiveTab('admin')}
                 className={cn(
@@ -405,7 +426,18 @@ export default function App() {
                   activeTab === 'admin' ? "bg-white text-nic-blue shadow-sm font-extrabold" : "text-zinc-500 hover:text-zinc-800"
                 )}
               >
-                Admin
+                {userRole === 'superadmin' ? 'Superadmin' : 'Admin'}
+              </button>
+            )}
+            {userRole === 'driver' && (
+              <button 
+                onClick={() => setActiveTab('driver')}
+                className={cn(
+                  "px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer",
+                  activeTab === 'driver' ? "bg-white text-nic-blue shadow-sm font-extrabold" : "text-zinc-500 hover:text-zinc-800"
+                )}
+              >
+                Panel Chofer
               </button>
             )}
           </nav>
@@ -422,7 +454,17 @@ export default function App() {
               exit={{ opacity: 0, y: 15 }}
               className="w-full"
             >
-              <AdminPanel />
+              <AdminPanel currentUserRole={userRole as UserRole} />
+            </motion.div>
+          ) : activeTab === 'driver' ? (
+            <motion.div
+              key="driver"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+              className="w-full"
+            >
+              <DriverControlPanel routes={routes} stops={stops} drivers={drivers} />
             </motion.div>
           ) : activeTab === 'reports' ? (
             <motion.div
@@ -1038,7 +1080,7 @@ export default function App() {
           <span>Perfil</span>
         </button>
 
-        {userRole === 'admin' && (
+        {(userRole === 'admin' || userRole === 'superadmin') && (
           <button
             type="button"
             onClick={() => setActiveTab('admin')}
@@ -1048,7 +1090,21 @@ export default function App() {
             )}
           >
             <ShieldCheck size={20} />
-            <span>Admin</span>
+            <span>{userRole === 'superadmin' ? 'Superadmin' : 'Admin'}</span>
+          </button>
+        )}
+
+        {userRole === 'driver' && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('driver')}
+            className={cn(
+              "flex flex-col items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer",
+              activeTab === 'driver' ? "text-nic-blue" : "text-zinc-400 hover:text-zinc-600"
+            )}
+          >
+            <Bus size={20} />
+            <span>Chofer</span>
           </button>
         )}
       </nav>

@@ -13,8 +13,10 @@ import chinesePavilionBg from '../assets/images/chinese_pavilion_autumn_bg_17801
 // @ts-ignore
 import nicaraguaSunsetBg from '../assets/images/nica.png';
 
+import { UserRole } from '../types';
+
 interface LoginProps {
-  onLogin: (role: 'admin' | 'user') => void;
+  onLogin: (role: UserRole) => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
@@ -38,32 +40,58 @@ export default function Login({ onLogin }: LoginProps) {
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const inputUser = username.trim();
+    const inputUser = username.trim().toLowerCase();
+    const rawInput = username.trim();
 
-    // 1. Check if user is trying to log in as default local admin or local user
+    // 1. Check direct hardcoded credential shortcuts
+    if ((inputUser === 'cris') && password === 'cris123') {
+      localStorage.setItem('localAuth', 'superadmin');
+      localStorage.setItem('localAuth_name', 'Cris (Super Administrador)');
+      localStorage.setItem('localAuth_email', 'cris@nicago.ni');
+      localStorage.setItem('localAuth_id', 'superadmin-cris');
+      onLogin('superadmin');
+      return;
+    }
+
     if (inputUser === 'admin' && password === 'admin123') {
+      localStorage.setItem('localAuth', 'admin');
+      localStorage.setItem('localAuth_name', 'Administrador General');
+      localStorage.setItem('localAuth_email', 'admin@nicago.ni');
+      localStorage.setItem('localAuth_id', 'local-admin');
       onLogin('admin');
       return;
     }
-    if (inputUser === 'user' && password === 'user123') {
-      onLogin('user');
+
+    if ((inputUser === 'chofer' || inputUser === 'driver') && (password === 'chofer123' || password === 'driver123')) {
+      localStorage.setItem('localAuth', 'driver');
+      localStorage.setItem('localAuth_name', 'Don José (Chofer Ruta 101)');
+      localStorage.setItem('localAuth_email', 'chofer.jose@nicago.ni');
+      localStorage.setItem('localAuth_id', 'local-chofer');
+      onLogin('driver');
       return;
     }
 
-    // 2. Otherwise we check if they are entering their registered/custom phone number or email as passenger
+    if (inputUser === 'user' && password === 'user123') {
+      localStorage.setItem('localAuth', 'passenger');
+      localStorage.setItem('localAuth_name', 'Pasajero NicaGo');
+      localStorage.setItem('localAuth_id', 'local-user');
+      onLogin('passenger');
+      return;
+    }
+
+    // 2. Query Firestore by username, phoneNumber, or email
     setLoading(true);
     try {
-      let snap = await getDocs(query(collection(db, 'users'), where('phoneNumber', '==', inputUser)));
+      let snap = await getDocs(query(collection(db, 'users'), where('username', '==', inputUser)));
       if (snap.empty) {
-        snap = await getDocs(query(collection(db, 'users'), where('email', '==', inputUser)));
+        snap = await getDocs(query(collection(db, 'users'), where('phoneNumber', '==', rawInput)));
+      }
+      if (snap.empty) {
+        snap = await getDocs(query(collection(db, 'users'), where('email', '==', rawInput)));
       }
 
       if (snap.empty) {
-        if (password) {
-          setError(language === 'es' ? 'Usuario o número no encontrado. Revisa tus datos o crea una cuenta.' : 'User or phone number not found. Check your details or register.');
-        } else {
-          setError(t('login.errorNotRegistered'));
-        }
+        setError(language === 'es' ? 'Usuario, teléfono o correo no encontrado. Revisa tus datos.' : 'User, phone number or email not found.');
         setLoading(false);
         return;
       }
@@ -71,7 +99,7 @@ export default function Login({ onLogin }: LoginProps) {
       const userDoc = snap.docs[0].data();
       const userId = snap.docs[0].id;
 
-      // Check password if configured on user record
+      // Validate password if user document specifies one
       if (userDoc.password) {
         if (!password || password.trim() !== userDoc.password) {
           setError(language === 'es' ? 'Contraseña incorrecta. Por favor intenta de nuevo.' : 'Incorrect password. Please try again.');
@@ -80,16 +108,18 @@ export default function Login({ onLogin }: LoginProps) {
         }
       }
 
-      // Save credentials locally
-      localStorage.setItem('localAuth', 'user');
-      localStorage.setItem('localAuth_name', userDoc.name || 'Pasajero');
-      localStorage.setItem('localAuth_phone', userDoc.phoneNumber || inputUser);
+      const role: UserRole = (userDoc.role as UserRole) || 'passenger';
+
+      // Store authorization parameters
+      localStorage.setItem('localAuth', role);
+      localStorage.setItem('localAuth_name', userDoc.name || 'Usuario');
+      localStorage.setItem('localAuth_phone', userDoc.phoneNumber || rawInput);
       localStorage.setItem('localAuth_email', userDoc.email || '');
       localStorage.setItem('localAuth_id', userId);
 
-      onLogin('user');
+      onLogin(role);
     } catch (err: any) {
-      console.error("Error logging in passenger:", err);
+      console.error("Error logging in user:", err);
       setError(language === 'es' ? 'Error al ingresar: ' + err.message : 'Error logging in: ' + err.message);
     } finally {
       setLoading(false);
@@ -141,13 +171,13 @@ export default function Login({ onLogin }: LoginProps) {
       const docRef = await addDoc(collection(db, 'users'), newUserDoc);
 
       // Store authorization parameters
-      localStorage.setItem('localAuth', 'user');
+      localStorage.setItem('localAuth', 'passenger');
       localStorage.setItem('localAuth_name', name);
       localStorage.setItem('localAuth_phone', phone);
       localStorage.setItem('localAuth_email', email);
       localStorage.setItem('localAuth_id', docRef.id);
 
-      onLogin('user');
+      onLogin('passenger');
     } catch (err: any) {
       console.error("Error creating custom user path:", err);
       setError(t('login.errorRegister') + err.message);

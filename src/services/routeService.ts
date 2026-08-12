@@ -315,87 +315,51 @@ export class RouteService {
 
     const combinedOptions = [...directOptions, ...transferOptions];
 
-    // Double-pass deduplication logic:
-    // 1. Deduplicate by route-sequence (e.g. "R1" or "R1->R2") so users see only one choice per unique path setup
-    // 2. Filter redundant segments
+    // Single-pass strict deduplication: map every option to its unique route sequence fingerprint
+    // For direct routes: e.g. "M101"
+    // For transfer routes: e.g. "M101->T114"
     const uniqueOptionsMap = new Map<string, RouteOption>();
 
     for (const option of combinedOptions) {
-      // Extract unique sequential route IDs used in this option (filtering out consecutive duplicates)
-      const routeSeq: string[] = [];
+      // 1. Extract unique sequential route codes (collapsing consecutive steps on the same route)
+      const routeCodesSeq: string[] = [];
       for (const step of option.steps) {
         if (step.routeId) {
-          if (routeSeq.length === 0 || routeSeq[routeSeq.length - 1] !== step.routeId) {
-            routeSeq.push(step.routeId);
+          const routeObj = routes.find(r => r.id === step.routeId);
+          const code = routeObj ? (routeObj.code || routeObj.name || step.routeId).trim().toUpperCase() : step.routeId.trim().toUpperCase();
+          if (routeCodesSeq.length === 0 || routeCodesSeq[routeCodesSeq.length - 1] !== code) {
+            routeCodesSeq.push(code);
           }
         }
       }
 
-      // Check if there are any non-consecutive duplicate route IDs (e.g. Route A -> Route B -> Route A)
-      const hasDuplicateInSequence = new Set(routeSeq).size !== routeSeq.length;
-      if (hasDuplicateInSequence) {
+      if (routeCodesSeq.length === 0) continue;
+
+      // Discard loops or non-consecutive duplicate route codes in sequence (e.g. M101 -> M105 -> M101)
+      if (new Set(routeCodesSeq).size !== routeCodesSeq.length) {
         continue;
       }
 
-      // Generate Route ID Sequence Fingerprint
-      const routeSeqFingerprint = option.steps
-        .map(s => s.routeId)
-        .filter(Boolean)
-        .join('->');
+      // Fingerprint key for this route sequence (e.g. "M101" or "M101->T114")
+      const routeSequenceKey = routeCodesSeq.join('->');
 
-      // Generate Visual Step Fingerprint
-      const visualFingerprint = option.steps
-        .map(step => {
-          const stop = stops.find(s => s.id === step.stopId);
-          const stopName = stop ? stop.name.trim().toLowerCase() : '';
-          const route = step.routeId ? routes.find(r => r.id === step.routeId) : null;
-          const routeCode = (route && route.code) ? route.code.trim().toUpperCase() : '';
-          return `${step.type}:${routeCode}:${stopName}`;
-        })
-        .join(' | ');
-
-      // Use a combined key of route sequence and visual fingerprint to fully avoid duplicated options
-      const dedupeKey = `${routeSeqFingerprint}_${visualFingerprint}`;
-
-      const existing = uniqueOptionsMap.get(dedupeKey);
+      // Keep only the single most optimal option for this route sequence
+      const existing = uniqueOptionsMap.get(routeSequenceKey);
       if (!existing) {
-        uniqueOptionsMap.set(dedupeKey, option);
+        uniqueOptionsMap.set(routeSequenceKey, option);
       } else {
-        const currTime = option.estimatedTimeMinutes;
-        const prevTime = existing.estimatedTimeMinutes;
-        const currStops = option.totalStops;
-        const prevStops = existing.totalStops;
+        const currTime = option.estimatedTimeMinutes ?? 99;
+        const prevTime = existing.estimatedTimeMinutes ?? 99;
+        const currStops = option.totalStops ?? 99;
+        const prevStops = existing.totalStops ?? 99;
 
         if (currTime < prevTime || (currTime === prevTime && currStops < prevStops)) {
-          uniqueOptionsMap.set(dedupeKey, option);
+          uniqueOptionsMap.set(routeSequenceKey, option);
         }
       }
     }
 
-    // Now, further thin out redundant identical route-sequences (preferring the most optimal stops option)
-    const finalThinMap = new Map<string, RouteOption>();
-    for (const option of uniqueOptionsMap.values()) {
-      const routeSeqFingerprint = option.steps
-        .map(s => s.routeId)
-        .filter(Boolean)
-        .join('->');
-
-      const existing = finalThinMap.get(routeSeqFingerprint);
-      if (!existing) {
-        finalThinMap.set(routeSeqFingerprint, option);
-      } else {
-        const currTime = option.estimatedTimeMinutes;
-        const prevTime = existing.estimatedTimeMinutes;
-        const currStops = option.totalStops;
-        const prevStops = existing.totalStops;
-
-        if (currTime < prevTime || (currTime === prevTime && currStops < prevStops)) {
-          finalThinMap.set(routeSeqFingerprint, option);
-        }
-      }
-    }
-
-    const uniqueOptionsList = Array.from(finalThinMap.values());
+    const uniqueOptionsList = Array.from(uniqueOptionsMap.values());
 
     // Sort to prioritize those that pass first (lowest etaToBoardMinutes) or arrive sooner (lowest estimatedTimeMinutes)
     const sortedOptions = uniqueOptionsList.sort((a, b) => {

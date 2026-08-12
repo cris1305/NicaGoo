@@ -627,14 +627,19 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
     setIsLoadingPath(true);
 
     const fetchStreetRoute = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+
       try {
         // Construct coordinates list for OSRM URL: "lng,lat;lng,lat;..."
         const coordsQuery = stopCoords.map(([lat, lng]) => `${lng},${lat}`).join(';');
         const url = `https://router.project-osrm.org/route/v1/driving/${coordsQuery}?overview=full&geometries=geojson`;
 
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-          throw new Error('OSRM network request failed');
+          throw new Error(`OSRM HTTP error status: ${response.status}`);
         }
         const data = await response.json();
 
@@ -649,9 +654,9 @@ export default function MapView({ origin, destination, selectedRoute, onArrival 
           setStreetPath(pathBackup);
         }
       } catch (err) {
-        console.error("Error fetching street routing from OSRM:", err);
+        clearTimeout(timeoutId);
+        // Soft fallback to stop-to-stop path without triggering error overlays
         if (isMounted) {
-          // Fallback directly to straight lines
           const pathBackup = stopCoords.map(([lat, lng]) => [lat, lng] as L.LatLngExpression);
           setStreetPath(pathBackup);
         }

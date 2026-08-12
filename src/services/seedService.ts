@@ -6,6 +6,8 @@ import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandle
 import busImg1 from '../assets/images/managua_bus_route_1_1786548148778.jpg';
 import busImg2 from '../assets/images/managua_bus_route_2_1786548159770.jpg';
 import busImg3 from '../assets/images/managua_bus_route_3_1786548170710.jpg';
+import salvadorAllendeImg from '../assets/images/salvador_allende_managua_1786553692610.jpg';
+import tiscapaImg from '../assets/images/laguna_tiscapa_managua_1786553705377.jpg';
 
 // Coordinates for the 5 key connection points (Bahías/Paradas) of Managua
 const FIVE_CONNECTION_STOPS = [
@@ -46,11 +48,11 @@ const FIVE_CONNECTION_STOPS = [
   }
 ];
 
-// 5 Interconnected Routes
+// Interconnected Routes in Database
 const FIVE_CONNECTION_ROUTES = [
   { 
     name: 'Ruta 101 (UCA - Salvador Allende)', 
-    code: 'M101', 
+    code: 'Ruta 101', 
     color: '#0033a0', 
     status: 'excellent' as const, 
     photoUrl: busImg1,
@@ -58,7 +60,7 @@ const FIVE_CONNECTION_ROUTES = [
   },
   { 
     name: 'Ruta 105 (UCA - Mercado Huembes)', 
-    code: 'M105', 
+    code: 'Ruta 105', 
     color: '#10b981', 
     status: 'excellent' as const, 
     photoUrl: busImg2,
@@ -66,7 +68,7 @@ const FIVE_CONNECTION_ROUTES = [
   },
   { 
     name: 'Ruta 114 (Huembes - Plaza Inter)', 
-    code: 'T114', 
+    code: 'Ruta 114', 
     color: '#7c3aed', 
     status: 'good' as const, 
     photoUrl: busImg3,
@@ -74,7 +76,7 @@ const FIVE_CONNECTION_ROUTES = [
   },
   { 
     name: 'Ruta 119 (UCA - Salvador Allende Express)', 
-    code: 'O119', 
+    code: 'Ruta 119', 
     color: '#ec4899', 
     status: 'excellent' as const, 
     photoUrl: busImg1,
@@ -82,11 +84,35 @@ const FIVE_CONNECTION_ROUTES = [
   },
   { 
     name: 'Ruta 120 (Mercado Huembes - Salvador Allende)', 
-    code: 'M120', 
+    code: 'Ruta 120', 
     color: '#06b6d4', 
     status: 'excellent' as const, 
     photoUrl: busImg2,
     stopIndices: [4, 0, 3] // Mercado Huembes -> UCA -> Salvador Allende
+  },
+  { 
+    name: 'Ruta 125 (UCA - Plaza Inter Directa)', 
+    code: 'Ruta 125', 
+    color: '#f59e0b', 
+    status: 'excellent' as const, 
+    photoUrl: busImg3,
+    stopIndices: [0, 1, 2] // UCA -> Metrocentro -> Plaza Inter
+  },
+  { 
+    name: 'Ruta 168 (Metrocentro - Salvador Allende)', 
+    code: 'Ruta 168', 
+    color: '#8b5cf6', 
+    status: 'excellent' as const, 
+    photoUrl: busImg1,
+    stopIndices: [1, 2, 3] // Metrocentro -> Plaza Inter -> Salvador Allende
+  },
+  { 
+    name: 'Ruta 1010 (Expreso Urbano Managua)', 
+    code: 'Ruta 1010', 
+    color: '#059669', 
+    status: 'excellent' as const, 
+    photoUrl: busImg2,
+    stopIndices: [0, 1, 2, 3, 4] // UCA -> Metrocentro -> Plaza Inter -> Salvador Allende -> Huembes
   }
 ];
 
@@ -216,12 +242,12 @@ export const seedDatabase = async () => {
 
     // 4. Seed Mock Users
     const mockUsers = [
+      { name: 'Cris (Super Administrador)', email: 'cris@nicago.ni', username: 'cris', password: 'cris123', role: 'superadmin', phoneNumber: '+505 8888-9999', photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-01T08:00:00.000Z' },
+      { name: 'Administrador General', email: 'admin@nicago.ni', username: 'admin', password: 'admin123', role: 'admin', phoneNumber: '+505 8456-7890', photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-02T08:00:00.000Z' },
+      { name: 'Don José (Chofer Ruta 101)', email: 'chofer.jose@nicago.ni', username: 'chofer', password: 'chofer123', role: 'driver', phoneNumber: '+505 8765-4321', photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-05T08:00:00.000Z' },
       { name: 'Abelardo Solórzano', email: 'abelardo.solorzano@correo.ni', role: 'passenger', phoneNumber: '+505 8899-2311', photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-15T14:30:00.000Z' },
       { name: 'Blanca Estela Treminio', email: 'blanca.estela@yahoo.com', role: 'passenger', phoneNumber: '+505 7744-8855', photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-18T10:15:00.000Z' },
-      { name: 'Cristopher Ramírez', email: 'cristopheramirez20@gmail.com', role: 'admin', phoneNumber: '+505 8456-7890', photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-01T08:00:00.000Z' },
-      { name: 'Denis José Mayorga', email: 'denis.mayorga@gmail.com', role: 'passenger', phoneNumber: '+505 8122-3344', photoUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-20T16:45:00.000Z' },
-      { name: 'Fabiola Vanessa Ortiz', email: 'fabiola.ortiz@outlook.com', role: 'passenger', phoneNumber: '+505 8677-4499', photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-22T11:20:00.000Z' },
-      { name: 'Guillermo Antonio Sequeira', email: 'g.sequeira@gmail.com', role: 'passenger', phoneNumber: '+505 5566-7788', photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-24T09:10:00.000Z' }
+      { name: 'Fabiola Vanessa Ortiz', email: 'fabiola.ortiz@outlook.com', role: 'passenger', phoneNumber: '+505 8677-4499', photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200', createdAt: '2026-05-22T11:20:00.000Z' }
     ];
 
     for (const u of mockUsers) {
@@ -234,12 +260,12 @@ export const seedDatabase = async () => {
         title: 'Puerto Salvador Allende',
         subtitle: 'Malecón & Paseo del Lago Xolotlán',
         description: 'El destino turístico #1 de Managua a orillas del Lago Xolotlán. Ofrece restaurantes gastronómicos, paseos en bote, juegos infantiles, pista de Go Karts y el Paseo de los Leones.',
-        category: 'Puerto & Recreación',
-        coverPhoto: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800',
+        category: 'Sitios Turísticos',
+        coverPhoto: salvadorAllendeImg,
         galleryPhotos: [
-          'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800',
-          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800',
-          'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'
+          salvadorAllendeImg,
+          tiscapaImg,
+          'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800'
         ],
         schedule: 'Lunes a Domingo: 8:00 AM - 11:00 PM',
         entryFee: 'C$ 10 Córdobas',
@@ -248,19 +274,20 @@ export const seedDatabase = async () => {
         createdAt: new Date().toISOString()
       },
       {
-        title: 'Lomas de Tiscapa & Canopy',
-        subtitle: 'Reserva Natural Cráter de Tiscapa',
-        description: 'Parque histórico y mirador natural sobre el cráter de la Laguna de Tiscapa. Destaca la efigie monumental del General Sandino y tirolesa canopy extrema sobre la laguna.',
-        category: 'Parque & Mirador',
-        coverPhoto: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800',
+        title: 'Laguna de Tiscapa & Canopy',
+        subtitle: 'Reserva Natural & Mirador Cráter de Tiscapa',
+        description: 'Parque histórico y mirador natural sobre el cráter de la Laguna de Tiscapa en Managua. Destaca la efigie monumental del General Sandino y tirolesa canopy extrema sobre la laguna.',
+        category: 'Sitios Turísticos',
+        coverPhoto: tiscapaImg,
         galleryPhotos: [
-          'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800',
-          'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=800'
+          tiscapaImg,
+          salvadorAllendeImg,
+          'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'
         ],
         schedule: 'Todos los días: 6:00 AM - 6:00 PM',
         entryFee: 'Acceso Gratuito (Canopy C$ 150)',
         destinationStopName: 'Bahía Plaza Inter (Lomas de Tiscapa)',
-        recommendedRoutes: ['Ruta 105', 'Ruta 125'],
+        recommendedRoutes: ['Ruta 101', 'Ruta 114', 'Ruta 119'],
         createdAt: new Date().toISOString()
       },
       {

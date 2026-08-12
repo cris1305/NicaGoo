@@ -10,6 +10,8 @@ import { cn } from '../lib/utils';
 import { useLanguage } from '../lib/LanguageContext';
 import ometepeImg from '../assets/images/ometepe_nicaragua_1786487925454.jpg';
 import granadaImg from '../assets/images/granada_nicaragua_1786487935977.jpg';
+import salvadorAllendeImg from '../assets/images/salvador_allende_managua_1786553692610.jpg';
+import tiscapaImg from '../assets/images/laguna_tiscapa_managua_1786553705377.jpg';
 import busImg1 from '../assets/images/managua_bus_route_1_1786548148778.jpg';
 import busImg2 from '../assets/images/managua_bus_route_2_1786548159770.jpg';
 import busImg3 from '../assets/images/managua_bus_route_3_1786548170710.jpg';
@@ -22,37 +24,39 @@ const getRoutePhotoUrl = (url?: string, idx: number = 0) => {
 
 const DEFAULT_TOURIST_POSTS: TouristPost[] = [
   {
-    id: 'post-ometepe',
-    title: 'Isla de Ometepe & Volcán Concepción',
-    subtitle: 'Maravilla Natural en el Lago Cocibolca - Rivas',
-    description: 'Espectacular isla paradisíaca formada por dos majestuosos volcanes en el Lago de Nicaragua. Disfruta de la Reserva Charco Verde, la manantial natural Ojo de Agua, la cascada San Ramón y senderismo volcánico único en Centroamérica.',
+    id: 'post-salvador-allende',
+    title: 'Puerto Salvador Allende',
+    subtitle: 'Malecón & Paseo del Lago Xolotlán • Managua',
+    description: 'El destino turístico #1 de la capital a orillas del Lago Xolotlán. Ofrece restaurantes gastronómicos, paseos en bote por el lago, pistas de Go Karts, zonas infantiles y atardeceres espectaculares.',
     category: 'Sitios Turísticos',
-    coverPhoto: ometepeImg,
+    coverPhoto: salvadorAllendeImg,
     galleryPhotos: [
-      ometepeImg,
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800'
+      salvadorAllendeImg,
+      tiscapaImg,
+      'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800'
     ],
-    schedule: 'Ferry San Jorge -> Ometepe: 6:00 AM - 5:30 PM',
-    entryFee: 'Ferry desde C$ 50 / Ojo de Agua $5',
-    destinationStopName: 'Puerto de San Jorge (Conexión Mercado Roberto Huembes / Rivas)',
-    recommendedRoutes: ['Ruta 110', 'Ruta 133'],
+    schedule: 'Lunes a Domingo: 8:00 AM - 11:00 PM',
+    entryFee: 'C$ 10 Córdobas',
+    destinationStopName: 'Bahía Puerto Salvador Allende (Dupla Norte)',
+    recommendedRoutes: ['Ruta 101', 'Ruta 119', 'Ruta 120'],
     createdAt: new Date().toISOString()
   },
   {
-    id: 'post-granada',
-    title: 'Granada Colonial & Isletas del Lago',
-    subtitle: 'Patrimonio Histórico & Culinario de Nicaragua',
-    description: 'La joya colonial de Nicaragua con sus icónicas fachadas coloridas, catedrales históricas, paseos en carruaje de caballos y recorridos en lancha por las 365 Isletas del Lago Xolotlán y Cocibolca.',
+    id: 'post-tiscapa',
+    title: 'Laguna de Tiscapa & Canopy',
+    subtitle: 'Reserva Natural & Mirador Lomas de Tiscapa • Managua',
+    description: 'Emblemática reserva natural y mirador histórico sobre el cráter de la Laguna de Tiscapa en el centro de Managua. Cuenta con la efigie monumental del General Sandino y tirolesa canopy con vista panorámica a la capital.',
     category: 'Sitios Turísticos',
-    coverPhoto: granadaImg,
+    coverPhoto: tiscapaImg,
     galleryPhotos: [
-      granadaImg,
-      'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=800'
+      tiscapaImg,
+      salvadorAllendeImg,
+      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'
     ],
-    schedule: 'Todos los días - Tours de 8:00 AM a 6:00 PM',
-    entryFee: 'Paseo en lancha desde C$ 150',
-    destinationStopName: 'Terminal de Buses Granada (Mercado Roberto Huembes)',
-    recommendedRoutes: ['Ruta 110', 'Ruta 105'],
+    schedule: 'Todos los días: 6:00 AM - 6:00 PM',
+    entryFee: 'Acceso Gratuito (Canopy C$ 150)',
+    destinationStopName: 'Bahía Plaza Inter (Lomas de Tiscapa)',
+    recommendedRoutes: ['Ruta 101', 'Ruta 114', 'Ruta 119'],
     createdAt: new Date().toISOString()
   }
 ];
@@ -246,7 +250,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
     };
   }, []);
 
-  const handleSearch = async (overrideDest?: unknown) => {
+  const handleSearch = async (overrideDest?: unknown, autoNavigateToMap: boolean = false) => {
     if (overrideDest && typeof (overrideDest as any)?.preventDefault === 'function') {
       (overrideDest as any).preventDefault();
     }
@@ -259,10 +263,10 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
     // Resolve coordinates based on names for demo using the 10 most common locations of Managua
     const resolveCoords = (text: string, defaultVal: { lat: number; lng: number }) => {
       const lower = String(text || '').toLowerCase();
-      if (lower.includes('plaza inter') || lower.includes('inter')) {
+      if (lower.includes('tiscapa') || lower.includes('laguna') || lower.includes('plaza inter') || lower.includes('inter')) {
         return { lat: 12.1444, lng: -86.2724 };
       }
-      if (lower.includes('salvador allende') || lower.includes('puerto') || lower.includes('allende') || lower.includes('malecón')) {
+      if (lower.includes('salvador allende') || lower.includes('puerto') || lower.includes('allende') || lower.includes('malecón') || lower.includes('malecon')) {
         return { lat: 12.1610, lng: -86.2710 };
       }
       if (lower.includes('metrocentro')) {
@@ -336,11 +340,14 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
     onOriginChange(mockOrigin);
     onDestinationChange(mockDest);
 
+    let chosenOptionToSelect: RouteOption | null = null;
+
     try {
       const results = await RouteService.findBestRoutes(mockOrigin, mockDest);
       
       if (results.length > 0) {
         setOptions(results);
+        chosenOptionToSelect = results[0];
       } else if (routes.length > 0) {
         // Fallback: if no direct stop sequence was matched, return matching routes or default active routes so user ALWAYS gets route options!
         const searchTerms = [originText, targetDestName].map(s => s.toLowerCase().trim()).filter(Boolean);
@@ -352,7 +359,16 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
           );
         });
 
-        const selectedList = fallbackRoutes.length > 0 ? fallbackRoutes : routes.slice(0, 5);
+        const rawList = fallbackRoutes.length > 0 ? fallbackRoutes : routes;
+        // Deduplicate list by route code or name
+        const uniqueRoutesMap = new Map<string, Route>();
+        for (const r of rawList) {
+          const key = (r.code || r.name || r.id).trim().toUpperCase();
+          if (!uniqueRoutesMap.has(key)) {
+            uniqueRoutesMap.set(key, r);
+          }
+        }
+        const selectedList = Array.from(uniqueRoutesMap.values()).slice(0, 5);
         const generatedOptions: RouteOption[] = selectedList.map((r, idx) => {
           const items = routeStops.filter(rs => rs.routeId === r.id).sort((a,b) => a.sequence - b.sequence);
           const firstStop = stops.find(s => s.id === items[0]?.stopId);
@@ -380,6 +396,9 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
           };
         });
         setOptions(generatedOptions);
+        if (generatedOptions.length > 0) {
+          chosenOptionToSelect = generatedOptions[0];
+        }
       } else {
         setOptions([]);
       }
@@ -407,10 +426,16 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
           etaToBoardMinutes: 4 + idx
         }));
         setOptions(fallbackOptions);
+        if (fallbackOptions.length > 0) {
+          chosenOptionToSelect = fallbackOptions[0];
+        }
       }
     } finally {
       setHasSearched(true);
       setLoading(false);
+      if (autoNavigateToMap && chosenOptionToSelect) {
+        onRouteSelect(chosenOptionToSelect);
+      }
     }
 
     try {
@@ -748,7 +773,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                         "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border",
                         isDirect ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-indigo-50 text-indigo-600 border-indigo-100"
                       )}>
-                        {isDirect ? 'Directa' : 'Con Transbordo'}
+                        {isDirect ? 'Ruta Directa' : 'Ruta con Conexión'}
                       </div>
                       <div className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-blue-50 text-nic-blue border border-blue-100">
                         En parada: {option.etaToBoardMinutes ?? 5} min
@@ -809,12 +834,41 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-black text-zinc-900 truncate">
-                        Viajar en {firstRouteId ? (routes.find(r => r.id === firstRouteId)?.name || 'Transporte Recomendado') : 'Transporte Recomendado'}
+                        {(() => {
+                          const routeIdsInOption = Array.from(new Set(
+                            (option.steps || []).map(s => s.routeId).filter(Boolean)
+                          ));
+                          const routeObjects = routeIdsInOption
+                            .map(id => routes.find(r => r.id === id))
+                            .filter((r): r is Route => Boolean(r));
+
+                          const formatRouteLabel = (r: Route) => {
+                            const raw = r.code || r.name;
+                            if (/^ruta\b/i.test(raw)) return raw;
+                            const match = raw.match(/\d+/);
+                            return match ? `Ruta ${match[0]}` : `Ruta ${raw}`;
+                          };
+
+                          if (routeObjects.length === 0) {
+                            return 'Ruta Disponible';
+                          } else if (routeObjects.length === 1) {
+                            return formatRouteLabel(routeObjects[0]);
+                          } else {
+                            return routeObjects.map(formatRouteLabel).join(' ➔ ');
+                          }
+                        })()}
                       </h4>
                       
                       <div className="mt-3 space-y-1.5 bg-zinc-50 border border-zinc-100 p-3 rounded-2xl">
                         {(option.steps || []).map((step, sIdx) => {
                           const stop = stops.find(s => s.id === step.stopId);
+                          const stepRoute = routes.find(r => r.id === step.routeId);
+                          const routeLabel = stepRoute ? (
+                            /^ruta\b/i.test(stepRoute.code || stepRoute.name)
+                              ? (stepRoute.code || stepRoute.name)
+                              : `Ruta ${stepRoute.code || stepRoute.name}`
+                          ) : 'Ruta';
+
                           return (
                             <div key={sIdx} className="flex items-center gap-2 text-[11px] font-bold text-zinc-700">
                               <span className={cn(
@@ -826,13 +880,13 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                               <span className="truncate text-zinc-600 font-medium">
                                 {step.type === 'board' && (
                                   <>
-                                    Tomar en: <strong className="text-zinc-900">{stop?.name || 'Bahía inicial'}</strong>
+                                    Tomar <strong className="text-nic-blue">{routeLabel}</strong> en: <strong className="text-zinc-900">{stop?.name || 'Bahía inicial'}</strong>
                                     {step.time && <span className="ml-1.5 text-nic-blue font-black">({step.time})</span>}
                                   </>
                                 )}
                                 {step.type === 'transfer' && (
                                   <>
-                                    Transbordo en: <strong className="text-[#0033a0]">{stop?.name || 'Punto intermedio'}</strong>
+                                    Conexión en: <strong className="text-[#0033a0]">{stop?.name || 'Punto intermedio'}</strong> ➔ Cambiar a <strong className="text-indigo-600">{routeLabel}</strong>
                                   </>
                                 )}
                                 {step.type === 'ride' && (
@@ -850,7 +904,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                         <div className="mt-3 bg-indigo-50/90 border border-indigo-200 p-3 rounded-2xl flex items-start gap-2.5 text-[11px] text-indigo-900 leading-normal font-semibold">
                           <span className="text-indigo-500 text-sm leading-none shrink-0" style={{ marginTop: '1px' }}>ℹ️</span>
                           <div>
-                            <strong>¡Llega antes pero no es directa!</strong> Esta opción pasará primero por tu parada, pero requiere realizar un <strong>transbordo de ruta</strong> para completar el viaje.
+                            <strong>¡Llega primero a tu parada!</strong> Esta alternativa utiliza la combinación de rutas para llevarte más rápido a tu destino.
                           </div>
                         </div>
                       )}
@@ -1024,7 +1078,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                           </div>
                           <div className="min-w-0">
                             <span className="text-[9px] font-black uppercase text-nic-blue tracking-wider block leading-none">
-                              {isBoat ? 'Transbordo Acuático' : 'Unidad de Transporte'}
+                              {isBoat ? 'Ruta Marítima' : 'Línea de Transporte'}
                             </span>
                             <h4 className="text-xs font-black text-zinc-950 truncate group-hover:text-nic-blue transition-colors mt-1">
                               {routeObj.name}
@@ -1367,7 +1421,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                     handleGetGPSLocation();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     setTimeout(() => {
-                      handleSearch(destName);
+                      handleSearch(destName, true);
                     }, 300);
                   }}
                   className="w-full p-4 bg-gradient-to-r from-blue-50 to-sky-50 hover:from-blue-100 hover:to-sky-100 border border-blue-200/80 rounded-2xl flex items-center gap-4 text-left transition-all group cursor-pointer shadow-xs active:scale-[0.98]"
@@ -1410,7 +1464,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                           setTouristOriginModalPost(null);
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                           setTimeout(() => {
-                            handleSearch(destName);
+                            handleSearch(destName, true);
                           }, 200);
                         }}
                         className="p-3 bg-zinc-50 hover:bg-zinc-100 hover:border-nic-blue/40 border border-zinc-200/80 rounded-xl text-left text-xs font-extrabold text-zinc-800 transition-all flex items-center justify-between cursor-pointer group"
