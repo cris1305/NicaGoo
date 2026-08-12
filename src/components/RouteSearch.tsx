@@ -233,6 +233,9 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
   }, []);
 
   const handleSearch = async (overrideDest?: unknown) => {
+    if (overrideDest && typeof (overrideDest as any)?.preventDefault === 'function') {
+      (overrideDest as any).preventDefault();
+    }
     setLoading(true);
     const targetDestName = typeof overrideDest === 'string' ? overrideDest : String(destText || '');
     if (typeof overrideDest === 'string') {
@@ -512,7 +515,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
           </div>
         </div>
         
-            <div className="space-y-4 mb-8">
+            <form onSubmit={handleSearch} className="space-y-4 mb-8">
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-nic-blue transition-transform group-focus-within:scale-110">
                   <MapPin size={20} />
@@ -527,11 +530,6 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                   }}
                   onFocus={() => setFocusedInput('origin')}
                   onBlur={() => setTimeout(() => setFocusedInput(null), 300)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !loading && destText) {
-                      handleSearch();
-                    }
-                  }}
                   className="w-full pl-12 pr-14 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-nic-blue/5 focus:border-nic-blue transition-all font-bold"
                 />
                 <button
@@ -623,11 +621,6 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                   }}
                   onFocus={() => setFocusedInput('dest')}
                   onBlur={() => setTimeout(() => setFocusedInput(null), 300)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !loading && destText) {
-                      handleSearch();
-                    }
-                  }}
                   className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-nic-blue/5 focus:border-nic-blue transition-all font-bold"
                 />
                 {focusedInput === 'dest' && getFilteredSuggestions(destText).length > 0 && (
@@ -663,25 +656,25 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                   </div>
                 )}
               </div>
-            </div>
 
-            <button 
-              onClick={handleSearch}
-              disabled={loading || !destText}
-              className="w-full py-4 bg-nic-blue text-white rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-blue-900/20 active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  {t('search.loadingBtn')}
-                </>
-              ) : (
-                <>
-                  <Search size={18} />
-                  {t('search.submitBtn')}
-                </>
-              )}
-            </button>
+              <button 
+                type="submit"
+                disabled={loading || !destText}
+                className="w-full py-4 bg-nic-blue text-white rounded-2xl font-black text-xs uppercase tracking-wider hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-blue-900/20 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    {t('search.loadingBtn')}
+                  </>
+                ) : (
+                  <>
+                    <Search size={18} />
+                    {t('search.submitBtn')}
+                  </>
+                )}
+              </button>
+            </form>
       </motion.div>
 
       {hasSearched && (
@@ -708,7 +701,8 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
           </div>
           
           {options.map((option, idx) => {
-            const isDirect = !option.steps.some(s => s.type === 'transfer');
+            const firstRouteId = option.steps?.[0]?.routeId;
+            const isDirect = !option.steps?.some(s => s.type === 'transfer');
             const isFastestETABoard = option.etaToBoardMinutes !== undefined && option.etaToBoardMinutes === Math.min(...options.map(o => o.etaToBoardMinutes ?? 99));
 
             return (
@@ -750,22 +744,22 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                     </div>
                     <div className="flex items-center gap-1">
                       <button 
-                        onClick={(e) => option.steps[0].routeId && toggleFavorite(e, option.steps[0].routeId)}
+                        onClick={(e) => firstRouteId && toggleFavorite(e, firstRouteId)}
                         className={cn(
                           "p-2 rounded-xl transition-all",
-                          option.steps[0].routeId && favorites.includes(option.steps[0].routeId) ? "text-nic-red bg-red-50" : "text-zinc-300 hover:text-nic-red"
+                          firstRouteId && favorites.includes(firstRouteId) ? "text-nic-red bg-red-50" : "text-zinc-300 hover:text-nic-red"
                         )}
                       >
-                        <Heart size={16} fill={option.steps[0].routeId && favorites.includes(option.steps[0].routeId) ? "currentColor" : "none"} />
+                        <Heart size={16} fill={firstRouteId && favorites.includes(firstRouteId) ? "currentColor" : "none"} />
                       </button>
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (option.steps[0].routeId) {
-                            const route = routes.find(r => r.id === option.steps[0].routeId);
+                          if (firstRouteId) {
+                            const route = routes.find(r => r.id === firstRouteId);
                             setReportingTarget({ 
                               type: 'route', 
-                              id: option.steps[0].routeId,
+                              id: firstRouteId,
                               driverId: route?.driverId
                             });
                           }
@@ -779,9 +773,9 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                   
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-300 overflow-hidden border border-zinc-100 shadow-inner">
-                      {option.steps[0].routeId && routes.find(r => r.id === option.steps[0].routeId)?.photoUrl ? (
+                      {firstRouteId && routes.find(r => r.id === firstRouteId)?.photoUrl ? (
                         <img 
-                          src={routes.find(r => r.id === option.steps[0].routeId)?.photoUrl} 
+                          src={routes.find(r => r.id === firstRouteId)?.photoUrl} 
                           alt="" 
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
@@ -792,11 +786,11 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-black text-zinc-900 truncate">
-                        Viajar en {routes.find(r => r.id === option.steps[0].routeId)?.name || 'Transporte Recomendado'}
+                        Viajar en {firstRouteId ? (routes.find(r => r.id === firstRouteId)?.name || 'Transporte Recomendado') : 'Transporte Recomendado'}
                       </h4>
                       
                       <div className="mt-3 space-y-1.5 bg-zinc-50 border border-zinc-100 p-3 rounded-2xl">
-                        {option.steps.map((step, sIdx) => {
+                        {(option.steps || []).map((step, sIdx) => {
                           const stop = stops.find(s => s.id === step.stopId);
                           return (
                             <div key={sIdx} className="flex items-center gap-2 text-[11px] font-bold text-zinc-700">
@@ -815,7 +809,7 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                                 )}
                                 {step.type === 'transfer' && (
                                   <>
-                                    Transbordo en: <strong className="text-indigo-600">{stop?.name || 'Punto intermedio'}</strong>
+                                    Transbordo en: <strong className="text-[#0033a0]">{stop?.name || 'Punto intermedio'}</strong>
                                   </>
                                 )}
                                 {step.type === 'ride' && (
@@ -842,11 +836,13 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                         <p className="text-[10px] font-bold text-zinc-400">
                           {option.totalStops} paradas en total
                         </p>
-                        <span className="text-[10px] text-zinc-300">•</span>
-                        {option.steps[0].routeId && (
-                          <span className="text-[10px] font-black text-nic-blue/70">
-                            Placa: {routes.find(r => r.id === option.steps[0].routeId)?.code}
-                          </span>
+                        {firstRouteId && (
+                          <>
+                            <span className="text-[10px] text-zinc-300">•</span>
+                            <span className="text-[10px] font-black text-nic-blue/70">
+                              Placa: {routes.find(r => r.id === firstRouteId)?.code}
+                            </span>
+                          </>
                         )}
                       </div>
                     </div>

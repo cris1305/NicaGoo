@@ -287,6 +287,7 @@ export default function App() {
 
   const handleRouteSelect = (route: RouteOption) => {
     setSelectedRoute(route);
+    setMobileMapTab('map');
     setShowNavChoice(true);
   };
 
