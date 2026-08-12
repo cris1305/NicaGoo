@@ -10,6 +10,15 @@ import { cn } from '../lib/utils';
 import { useLanguage } from '../lib/LanguageContext';
 import ometepeImg from '../assets/images/ometepe_nicaragua_1786487925454.jpg';
 import granadaImg from '../assets/images/granada_nicaragua_1786487935977.jpg';
+import busImg1 from '../assets/images/managua_bus_route_1_1786548148778.jpg';
+import busImg2 from '../assets/images/managua_bus_route_2_1786548159770.jpg';
+import busImg3 from '../assets/images/managua_bus_route_3_1786548170710.jpg';
+
+const DEFAULT_BUS_PHOTOS = [busImg1, busImg2, busImg3];
+const getRoutePhotoUrl = (url?: string, idx: number = 0) => {
+  if (url && url.trim() !== '') return url;
+  return DEFAULT_BUS_PHOTOS[idx % DEFAULT_BUS_PHOTOS.length];
+};
 
 const DEFAULT_TOURIST_POSTS: TouristPost[] = [
   {
@@ -711,23 +720,27 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
             <span className="text-[10px] font-bold text-nic-blue bg-nic-blue/5 px-2 py-1 rounded-full">{options.length} opciones</span>
           </div>
           
-          {options.map((option, idx) => {
-            const firstRouteId = option.steps?.[0]?.routeId;
-            const isDirect = !option.steps?.some(s => s.type === 'transfer');
-            const isFastestETABoard = option.etaToBoardMinutes !== undefined && option.etaToBoardMinutes === Math.min(...options.map(o => o.etaToBoardMinutes ?? 99));
+          {(() => {
+            const minETABoard = Math.min(...options.map(o => o.etaToBoardMinutes ?? 99));
+            const singleFastestIdx = options.findIndex(o => (o.etaToBoardMinutes ?? 99) === minETABoard);
 
-            return (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                onClick={() => onRouteSelect(option)}
-                className={cn(
-                  "w-full bg-white p-5 rounded-3xl border hover:shadow-xl transition-all text-left relative overflow-hidden cursor-pointer group",
-                  isFastestETABoard ? "border-sky-300 shadow-sm shadow-sky-500/5 hover:border-sky-400" : "border-zinc-100 hover:border-nic-blue/30"
-                )}
-              >
+            return options.map((option, idx) => {
+              const firstRouteId = option.steps?.[0]?.routeId;
+              const isDirect = !option.steps?.some(s => s.type === 'transfer');
+              const isFastestETABoard = idx === singleFastestIdx && (option.etaToBoardMinutes ?? 99) < 99;
+
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  onClick={() => onRouteSelect(option)}
+                  className={cn(
+                    "w-full bg-white p-5 rounded-3xl border hover:shadow-xl transition-all text-left relative overflow-hidden cursor-pointer group",
+                    isFastestETABoard ? "border-sky-300 shadow-sm shadow-sky-500/5 hover:border-sky-400" : "border-zinc-100 hover:border-nic-blue/30"
+                  )}
+                >
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex flex-wrap items-center gap-2">
@@ -783,17 +796,16 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                   </div>
                   
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-300 overflow-hidden border border-zinc-100 shadow-inner">
-                      {firstRouteId && routes.find(r => r.id === firstRouteId)?.photoUrl ? (
-                        <img 
-                          src={routes.find(r => r.id === firstRouteId)?.photoUrl} 
-                          alt="" 
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <Bus size={20} />
-                      )}
+                    <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-zinc-300 overflow-hidden border border-zinc-100 shadow-inner shrink-0">
+                      <img 
+                        src={getRoutePhotoUrl(firstRouteId ? routes.find(r => r.id === firstRouteId)?.photoUrl : undefined, idx)} 
+                        alt="" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = DEFAULT_BUS_PHOTOS[idx % DEFAULT_BUS_PHOTOS.length];
+                        }}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-black text-zinc-900 truncate">
@@ -862,7 +874,8 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                 </div>
               </motion.div>
             );
-          })}
+          });
+        })()}
         </div>
       )}
     </>
@@ -897,7 +910,15 @@ export default function RouteSearch({ onRouteSelect, onOriginChange, onDestinati
                 className="p-5 bg-white border border-zinc-100 rounded-3xl flex items-center gap-4 hover:shadow-lg transition-all cursor-pointer group"
               >
                 <div className="w-14 h-14 bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 flex items-center justify-center shrink-0">
-                  {route.photoUrl ? <img src={route.photoUrl} alt="" className="w-full h-full object-cover" /> : <Bus size={24} className="text-zinc-200" />}
+                  <img 
+                    src={getRoutePhotoUrl(route.photoUrl, 0)} 
+                    alt="" 
+                    className="w-full h-full object-cover" 
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = busImg1;
+                    }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-black text-zinc-900">{route.name}</h4>

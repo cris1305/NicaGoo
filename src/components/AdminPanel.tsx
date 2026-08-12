@@ -15,6 +15,11 @@ import { db, storage, auth } from '../firebase';
 import { seedDatabase, clearDatabase } from '../services/seedService';
 import { Route, Stop, RouteStop, Driver, Report, Schedule, AppUser, TouristPost, isBoatRoute } from '../types';
 import RouteSearch from './RouteSearch';
+import busImg1 from '../assets/images/managua_bus_route_1_1786548148778.jpg';
+import busImg2 from '../assets/images/managua_bus_route_2_1786548159770.jpg';
+import busImg3 from '../assets/images/managua_bus_route_3_1786548170710.jpg';
+
+const DEFAULT_BUS_PHOTOS = [busImg1, busImg2, busImg3];
 import { 
   Plus, 
   Trash2, 
@@ -1178,21 +1183,17 @@ export default function AdminPanel() {
                         );
                       }
 
-                      return filtered.map(r => (
+                      return filtered.map((r, rIdx) => (
                         <div key={r.id} className="bg-white p-6 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl transition-all group animate-fadeIn">
                           <div className="flex items-center gap-4 mb-6">
-                            <div className="w-16 h-16 rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-100">
-                              {r.photoUrl && !failedImages[r.photoUrl] ? (
-                                <img 
-                                  src={r.photoUrl} 
-                                  alt="" 
-                                  className="w-full h-full object-cover" 
-                                  referrerPolicy="no-referrer" 
-                                  onError={() => setFailedImages(prev => ({ ...prev, [r.photoUrl]: true }))}
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-zinc-300"><Bus size={24} /></div>
-                              )}
+                            <div className="w-16 h-16 rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-100 shrink-0">
+                              <img 
+                                src={r.photoUrl && !failedImages[r.photoUrl] ? r.photoUrl : DEFAULT_BUS_PHOTOS[rIdx % DEFAULT_BUS_PHOTOS.length]} 
+                                alt="" 
+                                className="w-full h-full object-cover" 
+                                referrerPolicy="no-referrer" 
+                                onError={() => setFailedImages(prev => ({ ...prev, [r.photoUrl || 'default']: true }))}
+                              />
                             </div>
                             <div className="flex-1 overflow-hidden">
                               <h4 className="text-lg font-black text-zinc-900 truncate">{r.name}</h4>
@@ -1341,18 +1342,14 @@ export default function AdminPanel() {
                   ).map(s => (
                     <div key={s.id} className="bg-white p-6 rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-xl transition-all group">
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="w-14 h-14 rounded-2xl overflow-hidden bg-zinc-50 border border-zinc-100">
-                          {s.photoUrl && !failedImages[s.photoUrl] ? (
-                            <img 
-                              src={s.photoUrl} 
-                              alt="" 
-                              className="w-full h-full object-cover" 
-                              referrerPolicy="no-referrer" 
-                              onError={() => setFailedImages(prev => ({ ...prev, [s.photoUrl]: true }))}
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-zinc-200 bg-zinc-50"><MapPin size={24} /></div>
-                          )}
+                        <div className="w-14 h-14 rounded-2xl overflow-hidden bg-zinc-50 border border-zinc-100 shrink-0">
+                          <img 
+                            src={s.photoUrl && !failedImages[s.photoUrl] ? s.photoUrl : busImg2} 
+                            alt="" 
+                            className="w-full h-full object-cover" 
+                            referrerPolicy="no-referrer" 
+                            onError={() => setFailedImages(prev => ({ ...prev, [s.photoUrl || 'default-stop']: true }))}
+                          />
                         </div>
                         <div className="flex-1 overflow-hidden">
                           <h4 className="text-base font-black text-zinc-900 truncate">{s.name}</h4>

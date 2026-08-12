@@ -3,6 +3,10 @@ import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore'
 import { Route, Stop, RouteStop, Driver, Schedule } from '../types';
 import { handleFirestoreError, OperationType } from '../lib/firestoreErrorHandler';
 
+import busImg1 from '../assets/images/managua_bus_route_1_1786548148778.jpg';
+import busImg2 from '../assets/images/managua_bus_route_2_1786548159770.jpg';
+import busImg3 from '../assets/images/managua_bus_route_3_1786548170710.jpg';
+
 // Coordinates for the 5 key connection points (Bahías/Paradas) of Managua
 const FIVE_CONNECTION_STOPS = [
   { 
@@ -10,35 +14,35 @@ const FIVE_CONNECTION_STOPS = [
     lat: 12.1264, 
     lng: -86.2714, 
     generalInfo: 'Punto de conexión #1: Ubicada frente al portón principal de la Universidad Centroamericana (UCA). Interconexión neurálgica.', 
-    photoUrl: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=400' 
+    photoUrl: busImg1 
   },
   { 
     name: 'Bahía Metrocentro (Avenida de Masaya)', 
     lat: 12.1284, 
     lng: -86.2654, 
     generalInfo: 'Punto de conexión #2: Estación central frente a Metrocentro y Plaza El Sol.', 
-    photoUrl: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=80&w=400' 
+    photoUrl: busImg2 
   },
   { 
     name: 'Bahía Plaza Inter (Lomas de Tiscapa)', 
     lat: 12.1444, 
     lng: -86.2724, 
     generalInfo: 'Punto de conexión #3: Bahía junto a Plaza Inter y acceso a la Avenida Bolívar.', 
-    photoUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=400' 
+    photoUrl: busImg3 
   },
   { 
     name: 'Bahía Puerto Salvador Allende (Dupla Norte)', 
     lat: 12.1610, 
     lng: -86.2710, 
     generalInfo: 'Punto de conexión #4: Estación turística a orillas del Lago Xolotlán.', 
-    photoUrl: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&q=80&w=400' 
+    photoUrl: busImg1 
   },
   { 
     name: 'Bahía Mercado Roberto Huembes (Pista Solidaridad)', 
     lat: 12.1154, 
     lng: -86.2414, 
     generalInfo: 'Punto de conexión #5: Estación del Mercado Roberto Huembes y Terminal de Autobuses.', 
-    photoUrl: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&q=80&w=400' 
+    photoUrl: busImg2 
   }
 ];
 
@@ -49,7 +53,7 @@ const FIVE_CONNECTION_ROUTES = [
     code: 'M101', 
     color: '#0033a0', 
     status: 'excellent' as const, 
-    photoUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800',
+    photoUrl: busImg1,
     stopIndices: [0, 1, 2, 3] // UCA -> Metrocentro -> Plaza Inter -> Salvador Allende
   },
   { 
@@ -57,7 +61,7 @@ const FIVE_CONNECTION_ROUTES = [
     code: 'M105', 
     color: '#10b981', 
     status: 'excellent' as const, 
-    photoUrl: 'https://images.unsplash.com/photo-1494510614310-79a1d5a896d4?auto=format&fit=crop&q=80&w=800',
+    photoUrl: busImg2,
     stopIndices: [0, 1, 4] // UCA -> Metrocentro -> Mercado Huembes
   },
   { 
@@ -65,7 +69,7 @@ const FIVE_CONNECTION_ROUTES = [
     code: 'T114', 
     color: '#7c3aed', 
     status: 'good' as const, 
-    photoUrl: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=800',
+    photoUrl: busImg3,
     stopIndices: [4, 1, 2] // Mercado Huembes -> Metrocentro -> Plaza Inter
   },
   { 
@@ -73,7 +77,7 @@ const FIVE_CONNECTION_ROUTES = [
     code: 'O119', 
     color: '#ec4899', 
     status: 'excellent' as const, 
-    photoUrl: 'https://images.unsplash.com/photo-1561361531-99e46a74659f?auto=format&fit=crop&q=80&w=800',
+    photoUrl: busImg1,
     stopIndices: [0, 2, 3] // UCA -> Plaza Inter -> Salvador Allende
   },
   { 
@@ -81,7 +85,7 @@ const FIVE_CONNECTION_ROUTES = [
     code: 'M120', 
     color: '#06b6d4', 
     status: 'excellent' as const, 
-    photoUrl: 'https://images.unsplash.com/photo-1619542402915-dcaf30e4e2a1?auto=format&fit=crop&q=80&w=800',
+    photoUrl: busImg2,
     stopIndices: [4, 0, 3] // Mercado Huembes -> UCA -> Salvador Allende
   }
 ];

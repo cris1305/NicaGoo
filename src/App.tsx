@@ -27,6 +27,7 @@ import {
   Menu,
   X,
   AlertCircle,
+  ShieldCheck,
   User as UserIcon
 } from 'lucide-react';
 import { Route, Stop, RouteOption, Driver, Schedule, isBoatRoute } from './types';
@@ -408,15 +409,6 @@ export default function App() {
               </button>
             )}
           </nav>
-
-          {/* Hamburger button, visible ONLY on mobile */}
-          <button 
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="md:hidden p-2.5 text-zinc-700 hover:text-nic-blue bg-white hover:bg-zinc-50 rounded-2xl border border-zinc-200/80 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.08),0_4px_12px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_16px_-4px_rgba(0,0,0,0.1),0_4px_12px_-2px_rgba(0,0,0,0.05)] hover:border-nic-blue/30 focus:outline-none focus:ring-2 focus:ring-nic-blue/20 cursor-pointer transition-all duration-300 active:scale-95 flex items-center justify-center"
-            title="Abrir menú"
-          >
-            <Menu size={20} />
-          </button>
         </div>
       </header>
 
@@ -1045,6 +1037,20 @@ export default function App() {
           <UserIcon size={20} />
           <span>Perfil</span>
         </button>
+
+        {userRole === 'admin' && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('admin')}
+            className={cn(
+              "flex flex-col items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer",
+              activeTab === 'admin' ? "text-nic-blue" : "text-zinc-400 hover:text-zinc-600"
+            )}
+          >
+            <ShieldCheck size={20} />
+            <span>Admin</span>
+          </button>
+        )}
       </nav>
 
       {/* Luxury arrival notification toast */}
