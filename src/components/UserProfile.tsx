@@ -1432,9 +1432,9 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                     })}
                   </div>
 
-                  {/* Upload custom gallery photo button */}
-                  <div className="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3 relative z-10">
-                    <div className="flex items-center gap-3">
+                  {/* Upload custom gallery photo button or clear photo */}
+                  <div className="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3 relative z-10 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <label 
                         htmlFor="avatar-upload-file"
                         className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 border border-zinc-300 rounded-xl text-xs font-bold text-zinc-800 transition-all cursor-pointer flex items-center gap-2 active:scale-95"
@@ -1442,6 +1442,20 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                         <Camera size={14} className="text-nic-blue" />
                         <span>Subir Foto Personal</span>
                       </label>
+
+                      {editPhoto && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditPhoto('');
+                            setCustomGreetingText(null);
+                          }}
+                          className="px-3.5 py-2 bg-zinc-50 hover:bg-rose-50 text-zinc-600 hover:text-rose-600 border border-zinc-200 hover:border-rose-200 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+                        >
+                          <X size={13} />
+                          <span>Sin foto (por defecto)</span>
+                        </button>
+                      )}
 
                       {editPhoto && !NICARAGUA_FAUNA_AVATARS.some(a => a.url === editPhoto) && (
                         <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-xl">
@@ -1452,7 +1466,7 @@ export default function UserProfile({ onLogout }: UserProfileProps) {
                     </div>
 
                     <p className="text-[9px] text-zinc-400 font-mono text-right hidden sm:block">
-                      Sincronizado en tiempo real
+                      {editPhoto ? 'Foto personalizada' : 'Sin imagen asignada (opcional)'}
                     </p>
                   </div>
                 </div>

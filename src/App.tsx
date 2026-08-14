@@ -90,16 +90,19 @@ export default function App() {
     return (saved as any) || null;
   });
 
-  // Safe wrapping setters to keep localStorage and Browser History synchronized
+  // Safe wrapping setters to keep localStorage and Browser History strictly ordered
   const setActiveTab = (tab: 'search' | 'map' | 'reports' | 'profile' | 'admin' | 'driver') => {
+    if (tab === activeTab && !selectedRoute) return;
     localStorage.setItem('app_activeTab', tab);
     setActiveTabState(tab);
 
-    const state = { tab, hasRoute: !!selectedRoute, navMode: navMode };
-    const current = window.history.state;
-    if (!current || current.tab !== tab || current.hasRoute !== !!selectedRoute || current.navMode !== navMode) {
-      window.history.pushState(state, '');
-    }
+    const state = { 
+      tab, 
+      route: tab === 'map' ? selectedRoute : null, 
+      navMode: tab === 'map' ? navMode : null, 
+      timestamp: Date.now() 
+    };
+    window.history.pushState(state, '');
   };
 
   const setSelectedRoute = (route: RouteOption | null) => {
@@ -110,11 +113,13 @@ export default function App() {
     }
     setSelectedRouteState(route);
 
-    const state = { tab: activeTab, hasRoute: !!route, navMode: route ? navMode : null };
-    const current = window.history.state;
-    if (!current || current.tab !== activeTab || current.hasRoute !== !!route || current.navMode !== (route ? navMode : null)) {
-      window.history.pushState(state, '');
-    }
+    const state = { 
+      tab: activeTab, 
+      route: route, 
+      navMode: route ? navMode : null, 
+      timestamp: Date.now() 
+    };
+    window.history.pushState(state, '');
   };
 
   const setOrigin = (or: { lat: number; lng: number; address: string } | null) => {
@@ -147,35 +152,58 @@ export default function App() {
     }
     setNavModeState(mode);
 
-    const state = { tab: activeTab, hasRoute: !!selectedRoute, navMode: mode };
-    const current = window.history.state;
-    if (!current || current.tab !== activeTab || current.hasRoute !== !!selectedRoute || current.navMode !== mode) {
-      window.history.pushState(state, '');
+    const state = { 
+      tab: activeTab, 
+      route: selectedRoute, 
+      navMode: mode, 
+      timestamp: Date.now() 
+    };
+    window.history.pushState(state, '');
+  };
+
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      if (selectedRoute) {
+        setSelectedRoute(null);
+        setNavMode(null);
+      } else if (activeTab !== 'search') {
+        setActiveTab('search');
+      }
     }
   };
 
-  // Synchronize history states on mount and popstate events
+  // Synchronize history states strictly without clobbering history stack on re-render
   useEffect(() => {
-    // Replace initial state so we have a clean anchor
-    window.history.replaceState({
-      tab: activeTab,
-      hasRoute: !!selectedRoute,
-      navMode: navMode
-    }, '');
+    // Establish the base history anchor if missing
+    if (!window.history.state || !window.history.state.tab) {
+      window.history.replaceState({
+        tab: activeTab,
+        route: selectedRoute,
+        navMode: navMode,
+        timestamp: Date.now()
+      }, '');
+    }
 
     const handlePopState = (e: PopStateEvent) => {
+      // Dismiss any open top modals/drawers first
+      setIsMobileMenuOpen(false);
+      setShowNavChoice(false);
+
       const state = e.state;
-      if (state) {
-        if (state.tab) {
-          setActiveTabState(state.tab);
-          localStorage.setItem('app_activeTab', state.tab);
-        }
-        if (!state.hasRoute) {
+      if (state && state.tab) {
+        setActiveTabState(state.tab);
+        localStorage.setItem('app_activeTab', state.tab);
+
+        if (state.route) {
+          setSelectedRouteState(state.route);
+          localStorage.setItem('app_selectedRoute', JSON.stringify(state.route));
+        } else {
           setSelectedRouteState(null);
           localStorage.removeItem('app_selectedRoute');
-          setNavModeState(null);
-          localStorage.removeItem('app_navMode');
         }
+
         if (state.navMode !== undefined) {
           setNavModeState(state.navMode);
           if (state.navMode) {
@@ -185,7 +213,7 @@ export default function App() {
           }
         }
       } else {
-        // Fallback to default search view
+        // Fallback gracefully to default search
         setActiveTabState('search');
         localStorage.setItem('app_activeTab', 'search');
         setSelectedRouteState(null);
@@ -197,7 +225,7 @@ export default function App() {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [activeTab, selectedRoute, navMode]);
+  }, []);
 
   const [showNavChoice, setShowNavChoice] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -317,16 +345,35 @@ export default function App() {
   };
 
   const handleRouteSelect = (route: RouteOption) => {
-    setSelectedRoute(route);
+    setSelectedRouteState(route);
+    localStorage.setItem('app_selectedRoute', JSON.stringify(route));
     setMobileMapTab('map');
-    setActiveTab('map');
+    setActiveTabState('map');
+    localStorage.setItem('app_activeTab', 'map');
     setShowNavChoice(true);
+
+    const state = { 
+      tab: 'map', 
+      route: route, 
+      navMode: null, 
+      timestamp: Date.now() 
+    };
+    window.history.pushState(state, '');
   };
 
   const startNavigation = (mode: 'real-time' | 'static') => {
-    setNavMode(mode);
+    setNavModeState(mode);
+    localStorage.setItem('app_navMode', mode);
     setShowNavChoice(false);
-    setActiveTab('map');
+    setActiveTabState('map');
+
+    const state = { 
+      tab: 'map', 
+      route: selectedRoute, 
+      navMode: mode, 
+      timestamp: Date.now() 
+    };
+    window.history.pushState(state, '');
   };
 
   const handleArrival = () => {
@@ -546,9 +593,9 @@ export default function App() {
                     <div className="p-4 bg-nic-blue text-white flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <button 
-                          onClick={() => { setSelectedRoute(null); setNavMode(null); }} 
+                          onClick={handleGoBack} 
                           className="p-1.5 hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
-                          title="Volver al mapa general"
+                          title="Volver al paso anterior"
                         >
                           <ArrowLeft size={18} />
                         </button>

@@ -27,8 +27,11 @@ export interface FirestoreErrorInfo {
 }
 
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  const errorCode = (error as { code?: string })?.code || '';
+
   const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
+    error: errorMessage,
     authInfo: {
       userId: auth.currentUser?.uid,
       email: auth.currentUser?.email,
@@ -42,7 +45,21 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     },
     operationType,
     path
+  };
+
+  // If the error is network/connection/offline related, handle gracefully
+  const isOfflineOrNetworkError = 
+    errorCode === 'unavailable' ||
+    errorCode === 'failed-precondition' ||
+    errorMessage.toLowerCase().includes('unavailable') ||
+    errorMessage.toLowerCase().includes('offline') ||
+    errorMessage.toLowerCase().includes('could not reach cloud firestore');
+
+  if (isOfflineOrNetworkError) {
+    console.warn('Firestore offline/network warning:', JSON.stringify(errInfo));
+    return;
   }
+
   console.error('Firestore Error: ', JSON.stringify(errInfo));
   throw new Error(JSON.stringify(errInfo));
 }

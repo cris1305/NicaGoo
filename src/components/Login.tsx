@@ -116,6 +116,7 @@ export default function Login({ onLogin }: LoginProps) {
       localStorage.setItem('localAuth_phone', userDoc.phoneNumber || rawInput);
       localStorage.setItem('localAuth_email', userDoc.email || '');
       localStorage.setItem('localAuth_id', userId);
+      localStorage.setItem('localAuth_photo', userDoc.photoUrl || '');
 
       onLogin(role);
     } catch (err: any) {
@@ -157,7 +158,7 @@ export default function Login({ onLogin }: LoginProps) {
         return;
       }
 
-      // Record passenger document with password
+      // Record passenger document without mandatory photo
       const newUserDoc = {
         name,
         phoneNumber: phone,
@@ -176,6 +177,7 @@ export default function Login({ onLogin }: LoginProps) {
       localStorage.setItem('localAuth_phone', phone);
       localStorage.setItem('localAuth_email', email);
       localStorage.setItem('localAuth_id', docRef.id);
+      localStorage.setItem('localAuth_photo', ''); // Explicitly clean and empty photo for new users
 
       onLogin('passenger');
     } catch (err: any) {
